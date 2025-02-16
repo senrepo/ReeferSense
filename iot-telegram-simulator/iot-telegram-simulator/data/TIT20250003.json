@@ -1,0 +1,15 @@
+{
+  "containerid": "TIT20250003",
+  "imei": "350123451234575",
+  "manufactor": "Titan Shipping",
+  "model": "rmmw",
+  "frameworkVersion": "1.1",
+  "logged": null,
+  "power": "on",
+  "batteryPercent": 100,
+  "temperatureF": 25,
+  "defrosting": "no",
+  "humidityPercent": null,
+  "co2Percent": null,
+  "o2Percent": null
+}
