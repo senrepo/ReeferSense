@@ -24,20 +24,17 @@ namespace iot_gateway
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                    // Accept an incoming connection
-                    TcpClient client = server.AcceptTcpClient();
-                    _logger.LogInformation("Client connected");
+                TcpClient client = await server.AcceptTcpClientAsync();
+                _logger.LogInformation("Client connected");
 
-                    // Handle the client in a new thread
-
-                    Thread clientThread = new Thread(() => HandleClient(client));
-                    clientThread.Start();
+                // Handle the client asynchronously
+                _ = HandleClientAsync(client);
             }
 
             await Task.CompletedTask;
         }
 
-        private void HandleClient(TcpClient client)
+        private async Task HandleClientAsync(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
             byte[] buffer = new byte[1024];
@@ -45,7 +42,7 @@ namespace iot_gateway
 
             try
             {
-                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
                     string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                     _logger.LogInformation("Received: " + receivedMessage);
@@ -53,7 +50,7 @@ namespace iot_gateway
                     // Respond back to the client
                     string response = "Message received: " + receivedMessage;
                     byte[] responseData = Encoding.UTF8.GetBytes(response);
-                    stream.Write(responseData, 0, responseData.Length);
+                    await stream.WriteAsync(responseData, 0, responseData.Length);
                     _logger.LogInformation("Response sent.");
                 }
             }
@@ -67,5 +64,6 @@ namespace iot_gateway
                 _logger.LogInformation("Client disconnected.");
             }
         }
+
     }
 }

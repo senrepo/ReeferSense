@@ -26,52 +26,58 @@ namespace iot_telegram_simulator
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             string fileName = string.Empty;
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                using (TcpClient client = new TcpClient(_serverAddress, _port))
-                using (NetworkStream stream = client.GetStream())
+                try
                 {
-                    _logger.LogInformation("Connected to server.");
-
-                    while (!stoppingToken.IsCancellationRequested)
+                    using (TcpClient client = new TcpClient(_serverAddress, _port))
+                    using (NetworkStream stream = client.GetStream())
                     {
-                        string directoryPath = $"{AppDomain.CurrentDomain.BaseDirectory}/data";
+                        _logger.LogInformation("Connected to server.");
 
-                        foreach (string file in Directory.GetFiles(directoryPath, "*.json"))
+                        while (!stoppingToken.IsCancellationRequested)
                         {
-                            var hexString = GetJsonFileHex(file);
-                            fileName = Path.GetFileName(file);
+                            string directoryPath = $"{AppDomain.CurrentDomain.BaseDirectory}/data";
 
-                            // Send message to server
-                            byte[] data = Encoding.UTF8.GetBytes(hexString);
-                            stream.Write(data, 0, data.Length);
-                            _logger.LogInformation($"Telegram sent for {fileName}");
+                            foreach (string file in Directory.GetFiles(directoryPath, "*.json"))
+                            {
+                                var hexString = GetJsonFileHex(file);
+                                fileName = Path.GetFileName(file);
 
-                            // Receive response from server
-                            byte[] buffer = new byte[1024];
-                            int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                            string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                            _logger.LogInformation($"Server received the telegram for {fileName}");
+                                // Send message to server
+                                byte[] data = Encoding.UTF8.GetBytes(hexString);
+                                stream.Write(data, 0, data.Length);
+                                _logger.LogInformation($"Telegram sent for {fileName}");
+
+                                // Receive response from server
+                                byte[] buffer = new byte[1024];
+                                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                                string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                                _logger.LogInformation($"Server acknowledged for {fileName}");
+                            }
+
+                            if (stoppingToken.IsCancellationRequested)
+                            {
+                                _logger.LogWarning("Cancellation Requested, exiting operation.");
+                                break;
+                            }
+
+                            await Task.Delay(TimeSpan.FromSeconds(10));
                         }
-
-                        if (stoppingToken.IsCancellationRequested)
-                        {
-                            _logger.LogWarning($"Cancellation Requested so exiting the opearation.");
-                            break;
-                        }
-
-                        await Task.Delay(TimeSpan.FromMinutes(5));
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error: {ex.Message}");
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error occurred: {ex.Message}. Attempting to reconnect...");
+
+                    // Wait before trying to reconnect to avoid excessive retry attempts
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+                }
             }
 
             await Task.CompletedTask;
-
         }
+
 
         private string GetJsonFileHex(string filePath)
         {

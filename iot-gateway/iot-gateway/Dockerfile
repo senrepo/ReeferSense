@@ -25,4 +25,5 @@ RUN dotnet publish "./iot-gateway.csproj" -c $BUILD_CONFIGURATION -o /app/publis
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+EXPOSE 9000
 ENTRYPOINT ["dotnet", "iot-gateway.dll"]
