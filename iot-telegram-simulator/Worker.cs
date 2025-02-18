@@ -11,15 +11,17 @@ namespace iot_telegram_simulator
     {
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _config;
+        private readonly IHostEnvironment _env;
         private readonly string _serverAddress;
         private readonly int _port;
 
-        public Worker(ILogger<Worker> logger, IConfiguration config)
+        public Worker(ILogger<Worker> logger, IConfiguration config, IHostEnvironment env)
         {
             _logger = logger;
             _config = config;
+            _env = env;
 
-            _serverAddress = _config["AppSettings:ServerAddress"];
+            _serverAddress = _config["AppSettings:IotGatewayServer"];
             _port = int.Parse(_config["AppSettings:Port"]);
         }
 
@@ -37,7 +39,8 @@ namespace iot_telegram_simulator
 
                         while (!stoppingToken.IsCancellationRequested)
                         {
-                            string directoryPath = $"{AppDomain.CurrentDomain.BaseDirectory}/data";
+                            string directoryPath = Path.Combine(_env.ContentRootPath, "data");
+                            _logger.LogInformation($"Checking for files in {directoryPath}...");
 
                             foreach (string file in Directory.GetFiles(directoryPath, "*.json"))
                             {

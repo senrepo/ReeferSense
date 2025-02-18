@@ -1,0 +1,22 @@
+services:
+  iot-gateway:
+    image: ${DOCKER_REGISTRY-}iotgateway
+    build:
+      context: .
+      dockerfile: iot-gateway/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+
+  iot-telegram-simulator:
+    image: ${DOCKER_REGISTRY-}iottelegramsimulator
+    build:
+      context: .
+      dockerfile: iot-telegram-simulator/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - AppSettings__IotGatewayServer=iot-gateway
+      - AppSettings__Port=9000
+    volumes:
+      - ./iot-telegram-simulator/data:/app/data
+  
+  
