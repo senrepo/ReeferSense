@@ -50,8 +50,8 @@ namespace iot_gateway
             {
                 while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
-                    string hexMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    _logger.LogInformation("Received message");
+                    string hexTelegram = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    _logger.LogInformation("Received telegram");
 
                     // Respond back to the client
                     string response = "ACK";
@@ -60,11 +60,11 @@ namespace iot_gateway
                     _logger.LogInformation("ACK Response sent");
 
                     // Convert the hex string to string
-                    string message = ConvertFromHex(hexMessage);
+                    string telegram = ConvertFromHex(hexTelegram);
                     //_logger.LogInformation("Received data: " + message);
 
                     // Send the message to the service bus queue
-                    await SendMessageAsync(message);
+                    await SendMessageAsync(telegram);
                 }
             }
             catch (Exception ex)
@@ -78,13 +78,13 @@ namespace iot_gateway
             }
         }
 
-        private string ConvertFromHex(string hexInput)
+        private string ConvertFromHex(string hexData)
         {
-            byte[] bytes = new byte[hexInput.Length / 2];
+            byte[] bytes = new byte[hexData.Length / 2];
 
             for (int i = 0; i < bytes.Length; i++)
             {
-                bytes[i] = Convert.ToByte(hexInput.Substring(i * 2, 2), 16);
+                bytes[i] = Convert.ToByte(hexData.Substring(i * 2, 2), 16);
             }
 
             return Encoding.UTF8.GetString(bytes);
@@ -102,11 +102,11 @@ namespace iot_gateway
             {
                 ServiceBusMessage busMessage = new ServiceBusMessage(message);
                 await _sender.SendMessageAsync(busMessage);
-                _logger.LogInformation("Message sent to service bus queue");
+                _logger.LogInformation("Telegram sent to service bus queue");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending message to service bus queue: {ex.Message}");
+                Console.WriteLine($"Error sending telegram to service bus queue: {ex.Message}");
             }
         }
 
