@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
+using Azure.Messaging.ServiceBus;
 
 namespace iot_gateway
 {
@@ -9,11 +10,16 @@ namespace iot_gateway
         private const int Port = 9000;
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _config;
+        private readonly string _serviceBusConnectionString;
+        private readonly string _queueName;
+        private ServiceBusClient _client;
+        private ServiceBusSender _sender;
 
         public Worker(ILogger<Worker> logger, IConfiguration config)
         {
             _logger = logger;
-            _config = config;
+            _serviceBusConnectionString = config["AppSettings:ServiceBus:ConnectionString"];
+            _queueName = config["AppSettings:ServiceBus:QueueName"];
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,14 +50,21 @@ namespace iot_gateway
             {
                 while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
-                    string receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    _logger.LogInformation("Received: " + receivedMessage);
+                    string hexMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    _logger.LogInformation("Received message");
 
                     // Respond back to the client
-                    string response = "Message received: " + receivedMessage;
+                    string response = "ACK";
                     byte[] responseData = Encoding.UTF8.GetBytes(response);
                     await stream.WriteAsync(responseData, 0, responseData.Length);
-                    _logger.LogInformation("Response sent.");
+                    _logger.LogInformation("ACK Response sent");
+
+                    // Convert the hex string to string
+                    string message = ConvertFromHex(hexMessage);
+                    //_logger.LogInformation("Received data: " + message);
+
+                    // Send the message to the service bus queue
+                    await SendMessageAsync(message);
                 }
             }
             catch (Exception ex)
@@ -61,9 +74,47 @@ namespace iot_gateway
             finally
             {
                 client.Close();
-                _logger.LogInformation("Client disconnected.");
+                _logger.LogInformation("Client disconnected");
             }
         }
 
+        private string ConvertFromHex(string hexInput)
+        {
+            byte[] bytes = new byte[hexInput.Length / 2];
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = Convert.ToByte(hexInput.Substring(i * 2, 2), 16);
+            }
+
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        private async Task SendMessageAsync(string message)
+        {
+            if(_client == null)
+            {
+                _client = new ServiceBusClient(_serviceBusConnectionString);
+                _sender = _client.CreateSender(_queueName);
+            }
+
+            try
+            {
+                ServiceBusMessage busMessage = new ServiceBusMessage(message);
+                await _sender.SendMessageAsync(busMessage);
+                _logger.LogInformation("Message sent to service bus queue");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message to service bus queue: {ex.Message}");
+            }
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _sender.DisposeAsync();
+            _client.DisposeAsync();
+        }
     }
 }

@@ -2,3 +2,6 @@
 .NET Core Background Service
     https://learn.microsoft.com/en-us/dotnet/core/extensions/workers
 
+Azure Service Bus emulator
+    https://learn.microsoft.com/en-us/azure/service-bus-messaging/overview-emulator
+    https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script

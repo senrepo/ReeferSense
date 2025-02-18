@@ -56,7 +56,7 @@ namespace iot_telegram_simulator
                                 byte[] buffer = new byte[1024];
                                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                                 string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                                _logger.LogInformation($"Server acknowledged for {fileName}");
+                                if(response == "ACK") _logger.LogInformation($"ACK response received for {fileName}");
                             }
 
                             if (stoppingToken.IsCancellationRequested)
