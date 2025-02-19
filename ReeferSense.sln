@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7A4A3AB3-6
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2F62CB7D-07AE-4DA7-BA4A-3CB650995156}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "reefer-sense-db", "reefer-sense-db\reefer-sense-db.sqlproj", "{4333AF8B-0024-43ED-8AFF-35830AE25E27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,12 @@ Global
 		{2F62CB7D-07AE-4DA7-BA4A-3CB650995156}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F62CB7D-07AE-4DA7-BA4A-3CB650995156}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F62CB7D-07AE-4DA7-BA4A-3CB650995156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

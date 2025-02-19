@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="deb3db8f-b36e-48dd-ac37-b2b7eb2528d4" ChangeDateTime="02/19/2025 02:37:11">
+    <Property Name="ElementName" Value="[dbo].[Table1].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table1]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3b993932-bcdf-4ac4-8c63-3abb743d8420" ChangeDateTime="02/19/2025 02:45:39">
+    <Property Name="ElementName" Value="[dbo].[modem].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9505bebb-3a57-4f46-8ae6-d5072c007f48" ChangeDateTime="02/19/2025 02:57:42">
+    <Property Name="ElementName" Value="[dbo].[Table2].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table2]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1337f1d2-224c-49b9-a8cf-d8105fa3b62c" ChangeDateTime="02/19/2025 02:59:57">
+    <Property Name="ElementName" Value="[dbo].[Table2].[updaNOT ted- DEFAULT GETDATE() DEFAULT GETDATE()dt]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table2]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="updated-dt" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c4643ad6-1f8c-44e6-857f-9fac473629df" ChangeDateTime="02/19/2025 03:01:49">
+    <Property Name="ElementName" Value="[dbo].[container-modem].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[container-modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="01b859d6-7dac-4bb1-8608-49159f3a4e17" ChangeDateTime="02/19/2025 03:02:35">
+    <Property Name="ElementName" Value="[dbo].[container-modem].[containerid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[container-modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="682fd402-3a5a-4f88-97f1-a99b64f79ca5" ChangeDateTime="02/19/2025 03:04:09">
+    <Property Name="ElementName" Value="[dbo].[modem-firmware].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[modem-firmware]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9bd62471-a4f0-41ac-b6b0-f1bad5e02055" ChangeDateTime="02/19/2025 03:08:46">
+    <Property Name="ElementName" Value="[dbo].[shipping-company].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[shipping-company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="403c452a-9535-4f5e-b505-a7a76369368d" ChangeDateTime="02/19/2025 03:11:18">
+    <Property Name="ElementName" Value="[dbo].[shipping-company].[updated-by]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[shipping-company]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="updated" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9723f515-4e2f-4812-b049-236d4dcc58d0" ChangeDateTime="02/19/2025 03:12:19">
+    <Property Name="ElementName" Value="[dbo].[shipping-company-container].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[shipping-company-container]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d14ccfc4-d878-4758-8522-db7f27d29384" ChangeDateTime="02/19/2025 03:14:00">
+    <Property Name="ElementName" Value="[dbo].[user].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[user]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1c8cd22b-f852-4eed-80be-372df095ad3f" ChangeDateTime="02/19/2025 03:16:41">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-latest].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-latest]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="aea9c8d4-d1b4-438c-a8e2-086f9f715cb2" ChangeDateTime="02/19/2025 03:19:58">
+    <Property Name="ElementName" Value="[dbo].[FK_container-modem_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[container-modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_container-modem_container]" />
+  </Operation>
+</Operations>
