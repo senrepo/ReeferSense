@@ -1,5 +1,6 @@
 services:
   iot-gateway:
+    container_name: "iot-gateway"
     image: ${DOCKER_REGISTRY-}iotgateway
     build:
       context: .
@@ -10,6 +11,7 @@ services:
       - AppSettings__ServiceBus__QueueName=iot-gateway-queue
 
   iot-telegram-simulator:
+    container_name: "iot-telegram-simulator"
     image: ${DOCKER_REGISTRY-}iottelegramsimulator
     build:
       context: .
@@ -43,8 +45,8 @@ services:
         MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
 
   sqlserver:
+    container_name: reefer-sense-sqlserver
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: reefer-sense-sqlserver-db
     ports:
         - "1450:1433"
     environment:
