@@ -91,4 +91,123 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[FK_container-modem_container]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="0426b642-cb15-464e-8d21-a6ddba647618" ChangeDateTime="02/19/2025 15:53:02">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ed50f1a2-c70e-4767-8d55-730ed6ee6133" ChangeDateTime="02/19/2025 15:54:21">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-latest].[temperature-id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-latest]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="temperature-latest-id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="362e7add-3218-40fa-a51b-2e1ec783b19c" ChangeDateTime="02/19/2025 16:04:00">
+    <Property Name="ElementName" Value="[dbo].[logged].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[logged]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f5c3937a-8b87-430b-8d81-be645aa3ad86" ChangeDateTime="02/19/2025 16:11:39">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history-container].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history-container]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="132b0a32-27d7-49ca-af12-028cf8f953ac" ChangeDateTime="02/19/2025 16:14:33">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history-container].[temperature-data-history-container-id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history-container]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="temperature-data-history-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eefc19f9-b4f4-4c30-b479-013c35ee358c" ChangeDateTime="02/20/2025 02:40:08">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[temp-history-id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="containerid" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="351c36a2-be3d-4823-90e4-3b044620ee51" ChangeDateTime="02/20/2025 02:40:25">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[humidity-percent]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="modem-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d2ad66b0-1134-4d47-b3c0-6069691277f2" ChangeDateTime="02/20/2025 02:40:31">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[containerid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="281b52e6-523d-46f9-82b9-daf92f412f0a" ChangeDateTime="02/20/2025 02:42:42">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[power-on]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="power" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8fa1df1d-c973-43ed-9c78-16c2dabcf228" ChangeDateTime="02/20/2025 03:00:00">
+    <Property Name="ElementName" Value="[dbo].[source].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[source]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2cd31323-ec76-4601-9900-25eba6c7b005" ChangeDateTime="02/20/2025 03:01:49">
+    <Property Name="ElementName" Value="[dbo].[vessel].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[vessel]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="711c803e-2199-44cb-8ca6-d3f6eefa6d3d" ChangeDateTime="02/20/2025 03:02:17">
+    <Property Name="ElementName" Value="[dbo].[vessel].[vess]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[vessel]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="vessel-name" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="27f838fc-22dc-4a86-9e64-cccd713bc058" ChangeDateTime="02/20/2025 03:05:26">
+    <Property Name="ElementName" Value="[dbo].[company-vessel].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[company-vessel]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="db933348-d6a2-4e26-930c-8d39ae248045" ChangeDateTime="02/20/2025 03:07:03">
+    <Property Name="ElementName" Value="[dbo].[vessel-container].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[vessel-container]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eb038c1c-96ee-4070-9d3a-13ecdf513ed7" ChangeDateTime="02/20/2025 03:15:21">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[container-ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container-id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="91cbfb54-6a28-4040-aab4-757f3d92b6b3" ChangeDateTime="02/20/2025 03:15:32">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[modem-ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="modem-imei" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4ef974e6-57cc-4745-a995-42fdaa66122a" ChangeDateTime="02/20/2025 03:17:11">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[vessel-ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="vessel-id" />
+  </Operation>
 </Operations>
