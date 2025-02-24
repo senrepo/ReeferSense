@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[shipping-company]
+﻿CREATE TABLE [dbo].[company]
 (
 	[ident] INT NOT NULL PRIMARY KEY, 
     [company-name] VARCHAR(50) NOT NULL, 

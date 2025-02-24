@@ -6,5 +6,5 @@
     [created-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     [updated-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     CONSTRAINT [FK_modem-firmware_modem] FOREIGN KEY ([modem-ident]) REFERENCES [modem]([ident]),
-    CONSTRAINT [FK_firmware-ident_firmware] FOREIGN KEY ([firmware-ident]) REFERENCES [firmware]([ident])
+    CONSTRAINT [FK_modem-firmware_firmware] FOREIGN KEY ([firmware-ident]) REFERENCES [firmware]([ident])
 )

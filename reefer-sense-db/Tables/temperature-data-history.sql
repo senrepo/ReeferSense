@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[temperature-data-history]
 (
 	[ident] INT NOT NULL PRIMARY KEY, 
-    [container-id] INT NOT NULL, 
+    [container-ident] INT NOT NULL, 
     [modem-imei] VARCHAR(15) NULL, 
-    [vessel-id] VARCHAR(25) NULL,
+    [vessel-ident] INT NULL,
     [temperaturF] DECIMAL(5, 2) NULL, 
     [logged-dt] DATETIME2 NOT NULL,
     [power] BIT,
@@ -13,8 +13,8 @@
     [deforsting] BIT NULL, 
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
-    CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container-id]) REFERENCES [container]([ident]), 
-    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-id]) REFERENCES [vessel]([ident]), 
-    CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem-imei]) REFERENCES [modem]([imei]), 
+    CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container-ident]) REFERENCES [container]([ident]), 
+    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-ident]) REFERENCES [vessel]([ident]), 
+    CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem-imei]) REFERENCES [modem]([modem-imei])
 
 )

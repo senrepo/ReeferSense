@@ -210,4 +210,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="vessel-id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="0a0ca652-ab95-4d48-9799-016fec4d82df" ChangeDateTime="02/24/2025 19:28:33">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[container-id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="99d73153-494d-40f4-9a11-73ac6441c308" ChangeDateTime="02/24/2025 19:28:37">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[vessel-id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="vessel-ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="aa3165c4-a0af-4c90-9cff-5f1a9ec93b62" ChangeDateTime="02/24/2025 19:39:47">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-latest].[modem-ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-latest]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="modem-imei" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="68b3f1dd-3352-4295-b187-8c2b1106b861" ChangeDateTime="02/24/2025 20:02:32">
+    <Property Name="ElementName" Value="[dbo].[modem].[imei]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="modem-imei" />
+  </Operation>
 </Operations>

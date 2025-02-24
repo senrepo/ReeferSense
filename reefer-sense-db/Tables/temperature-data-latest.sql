@@ -2,7 +2,7 @@
 (
 	[ident] INT NOT NULL PRIMARY KEY, 
     [container-ident] INT NOT NULL UNIQUE, 
-    [modem-ident] INT NULL, 
+    [modem-imei] VARCHAR(15) NULL, 
     [temperaturF] DECIMAL(5, 2) NULL, 
     [logged-dt] DATETIME2 NOT NULL,
     [power] BIT,
@@ -12,6 +12,6 @@
     [deforsting] BIT NULL, 
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received-dt] DATETIME2 NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container-ident]) REFERENCES [container]([ident]), 
-    CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem-ident]) REFERENCES [modem]([imei]), 
+    CONSTRAINT [FK_temperature-data-latest_container] FOREIGN KEY ([container-ident]) REFERENCES [container]([ident]), 
+    CONSTRAINT [FK_temperature-data-latest_modem] FOREIGN KEY ([modem-imei]) REFERENCES [modem]([modem-imei]) 
 )
