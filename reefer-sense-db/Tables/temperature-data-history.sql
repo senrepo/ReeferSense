@@ -14,7 +14,7 @@
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container-id]) REFERENCES [container]([ident]), 
-    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-id]) REFERENCES [vessel]([id]), 
+    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-id]) REFERENCES [vessel]([ident]), 
     CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem-imei]) REFERENCES [modem]([imei]), 
 
 )
