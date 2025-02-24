@@ -3,7 +3,7 @@
 	[ident] INT NOT NULL PRIMARY KEY, 
     [container-id] INT NOT NULL, 
     [modem-imei] VARCHAR(15) NULL, 
-    [vessel-id] VARCHAR(25) NULL,
+    [vessel-id] VARCHAR(25) NOT NULL,
     [temperaturF] DECIMAL(5, 2) NULL, 
     [logged-dt] DATETIME2 NOT NULL,
     [power] BIT,
