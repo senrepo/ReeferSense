@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Table2]
+﻿CREATE TABLE [dbo].[firmware]
 (
 	[ident] INT NOT NULL PRIMARY KEY, 
     [firmware-version] VARCHAR(25) NOT NULL, 
