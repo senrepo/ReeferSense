@@ -4,7 +4,7 @@
     [modem_imei] VARCHAR(15) NULL UNIQUE, 
     [model] VARCHAR(25) NOT NULL, 
     [manufacturer] VARCHAR(50) NOT NULL,
-    [created_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+    [created_dt] DATETIME2 NOT NULL , 
     [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     PRIMARY KEY ([ident]), 
 )

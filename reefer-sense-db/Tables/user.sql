@@ -5,6 +5,6 @@
     [first_name] VARCHAR(50) NOT NULL, 
     [last_name] VARCHAR(50) NOT NULL, 
     [active] BIT NOT NULL, 
-    [created_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+    [created_dt] DATETIME2 NOT NULL , 
     [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE()
 )

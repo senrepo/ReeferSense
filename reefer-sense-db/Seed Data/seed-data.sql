@@ -17,8 +17,8 @@ IF OBJECT_ID('dbo.container', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.container)
     BEGIN
-        INSERT INTO dbo.container(containerid, created_dt, updated_dt) 
-        VALUES ('CMA', GETDATE(), GETDATE());
+        INSERT INTO dbo.container(containerid, created_dt) 
+        VALUES ('CMA', GETDATE());
     END
 END
 
@@ -27,8 +27,8 @@ IF OBJECT_ID('dbo.firmware', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.firmware)
     BEGIN
-        INSERT INTO dbo.firmware(firmware_version, created_dt, updated_dt) 
-        VALUES ('1.1', GETDATE(), GETDATE());
+        INSERT INTO dbo.firmware(firmware_version, created_dt) 
+        VALUES ('1.1', GETDATE());
     END
 END
 
@@ -37,8 +37,8 @@ IF OBJECT_ID('dbo.modem', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.modem)
     BEGIN
-        INSERT INTO dbo.modem(modem_imei, model,manufacturer, created_dt, updated_dt) 
-        VALUES ('350123451234560', 'rmmw' , 'CMA CGM' , GETDATE(), GETDATE());
+        INSERT INTO dbo.modem(modem_imei, model,manufacturer, created_dt) 
+        VALUES ('350123451234560', 'rmmw' , 'CMA CGM' , GETDATE());
     END
 END
 
@@ -47,8 +47,8 @@ IF OBJECT_ID('dbo.vessel', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.vessel)
     BEGIN
-        INSERT INTO dbo.vessel(company_ident, vessel_id, vessel_name) 
-        VALUES ('1.1', GETDATE(), GETDATE());
+        INSERT INTO dbo.vessel(company_ident, vessel_id, vessel_name,created_dt) 
+        VALUES ('1001', 'CMAVSL001 ' , 'CMA ATLANTIC REEFER ' , GETDATE());
     END
 END
 
