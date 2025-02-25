@@ -1,10 +1,10 @@
 ﻿CREATE TABLE [dbo].[modem-firmware]
 (
 	[ident] INT NOT NULL PRIMARY KEY, 
-    [modem-ident] INT NOT NULL, 
-    [firmware-ident] INT NOT NULL, 
-    [created-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
-    [updated-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
-    CONSTRAINT [FK_modem-firmware_modem] FOREIGN KEY ([modem-ident]) REFERENCES [modem]([ident]),
-    CONSTRAINT [FK_modem-firmware_firmware] FOREIGN KEY ([firmware-ident]) REFERENCES [firmware]([ident])
+    [modem_ident] INT NOT NULL, 
+    [firmware_ident] INT NOT NULL, 
+    [created_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+    [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+    CONSTRAINT [FK_modem-firmware_modem] FOREIGN KEY ([modem_ident]) REFERENCES [modem]([ident]),
+    CONSTRAINT [FK_modem-firmware_firmware] FOREIGN KEY ([firmware_ident]) REFERENCES [firmware]([ident])
 )

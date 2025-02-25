@@ -57,6 +57,7 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables" />
+    <Folder Include="Seed Data" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\container.sql" />
@@ -70,6 +71,7 @@
     <Build Include="Tables\temperature-data-history.sql" />
     <Build Include="Tables\vessel.sql" />
     <Build Include="Tables\vessel-container.sql" />
+    <Build Include="Seed Data\seed-data.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="reefer-sense-db.refactorlog" />
