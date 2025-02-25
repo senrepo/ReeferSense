@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[modem-firmware]
 (
-	[ident] INT NOT NULL PRIMARY KEY, 
+	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [modem_ident] INT NOT NULL, 
     [firmware_ident] INT NOT NULL, 
     [created_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 

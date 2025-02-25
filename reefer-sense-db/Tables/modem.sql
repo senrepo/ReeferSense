@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[modem]
 (
-	[ident] INT NOT NULL , 
+	[ident] INT IDENTITY(1,1) NOT NULL , 
     [modem_imei] VARCHAR(15) NULL UNIQUE, 
     [model] VARCHAR(25) NOT NULL, 
     [manufacturer] VARCHAR(50) NOT NULL,

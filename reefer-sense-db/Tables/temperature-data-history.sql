@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[temperature-data-history]
 (
-	[ident] INT NOT NULL PRIMARY KEY, 
+	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [container_ident] INT NOT NULL, 
     [modem_imei] VARCHAR(15) NULL, 
     [vessel_id] VARCHAR(25) NULL,
