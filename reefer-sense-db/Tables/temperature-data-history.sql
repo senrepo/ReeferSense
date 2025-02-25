@@ -3,7 +3,7 @@
 	[ident] INT NOT NULL PRIMARY KEY, 
     [container-ident] INT NOT NULL, 
     [modem-imei] VARCHAR(15) NULL, 
-    [vessel-ident] INT NULL,
+    [vessel-id] VARCHAR(25) NULL,
     [temperaturF] DECIMAL(5, 2) NULL, 
     [logged-dt] DATETIME2 NOT NULL,
     [power] BIT,
@@ -14,7 +14,7 @@
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received-dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container-ident]) REFERENCES [container]([ident]), 
-    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-ident]) REFERENCES [vessel]([ident]), 
+    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel-id]) REFERENCES [vessel]([vessel-id]), 
     CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem-imei]) REFERENCES [modem]([modem-imei])
 
 )

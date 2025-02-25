@@ -238,4 +238,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="modem-imei" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="84f573e8-b9f9-4933-9a8a-fc288d1440fd" ChangeDateTime="02/24/2025 21:11:38">
+    <Property Name="ElementName" Value="[dbo].[temperature-data-history].[vessel-ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature-data-history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="vessel-id" />
+  </Operation>
 </Operations>

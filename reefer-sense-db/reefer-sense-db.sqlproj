@@ -69,7 +69,6 @@
     <Build Include="Tables\temperature-data-latest.sql" />
     <Build Include="Tables\temperature-data-history.sql" />
     <Build Include="Tables\vessel.sql" />
-    <Build Include="Tables\company-vessel.sql" />
     <Build Include="Tables\vessel-container.sql" />
   </ItemGroup>
   <ItemGroup>
