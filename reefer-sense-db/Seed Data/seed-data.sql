@@ -53,6 +53,15 @@ BEGIN
 END
 
 
+IF OBJECT_ID('dbo.vessel-container', 'U') IS NOT NULL
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM dbo.vessel-container)
+    BEGIN
+        INSERT INTO dbo.vessel-container(vessel_ident, container_ident,created_dt) 
+        VALUES ('1001', 'CMAVSL001 ' , 'CMA ATLANTIC REEFER ' , GETDATE());
+    END
+END
+
 
 
 GO

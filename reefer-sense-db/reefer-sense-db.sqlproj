@@ -63,14 +63,14 @@
     <Build Include="Tables\container.sql" />
     <Build Include="Tables\modem.sql" />
     <Build Include="Tables\firmware.sql" />
-    <Build Include="Tables\container-modem.sql" />
-    <Build Include="Tables\modem-firmware.sql" />
+    <Build Include="Tables\container_modem.sql" />
+    <Build Include="Tables\modem_firmware.sql" />
     <Build Include="Tables\company.sql" />
     <Build Include="Tables\user.sql" />
-    <Build Include="Tables\temperature-data-latest.sql" />
-    <Build Include="Tables\temperature-data-history.sql" />
+    <Build Include="Tables\temperature_data_latest.sql" />
+    <Build Include="Tables\temperature_data_history.sql" />
     <Build Include="Tables\vessel.sql" />
-    <Build Include="Tables\vessel-container.sql" />
+    <Build Include="Tables\vessel_container.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="reefer-sense-db.refactorlog" />
