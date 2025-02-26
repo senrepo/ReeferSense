@@ -1,3 +1,8 @@
+
+networks:
+  reefer-sense-network: 
+    driver: bridge
+
 services:
   iot-gateway:
     container_name: "iot-gateway"
@@ -9,6 +14,8 @@ services:
       - DOTNET_ENVIRONMENT=Development
       - AppSettings__ServiceBus__ConnectionString=Endpoint=sb://sb-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - AppSettings__ServiceBus__QueueName=iot-gateway-queue
+    networks:
+      - reefer-sense-network 
 
   iot-telegram-simulator:
     container_name: "iot-telegram-simulator"
@@ -22,7 +29,9 @@ services:
       - AppSettings__Port=9000
     volumes:
       - ./iot-telegram-simulator/data:/app/data
-  
+    networks:
+      - reefer-sense-network 
+
   sb-emulator:
     container_name: "servicebus-emulator"
     image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
@@ -36,25 +45,31 @@ services:
       ACCEPT_EULA: ${ACCEPT_EULA}
     depends_on:
       - sqledge
+    networks:
+      - reefer-sense-network
 
   sqledge:
     container_name: "sqledge"
     image: "mcr.microsoft.com/azure-sql-edge:latest"
     environment:
-        ACCEPT_EULA: ${ACCEPT_EULA}
-        MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      ACCEPT_EULA: ${ACCEPT_EULA}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+    networks:
+      - reefer-sense-network
 
   sqlserver:
     container_name: reefer-sense-sqlserver
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
-        - "1450:1433"
+      - "1450:1433"
     environment:
-        MSSQL_SA_PASSWORD: "ReeferSense@2025"
-        ACCEPT_EULA: ${ACCEPT_EULA}
+      MSSQL_SA_PASSWORD: "ReeferSense@2025"
+      ACCEPT_EULA: ${ACCEPT_EULA}
     volumes:
-        - sqlserver_data:/var/opt/mssql
+      - sqlserver_data:/var/opt/mssql
     restart: always
- 
+    networks:
+      - reefer-sense-network 
+
 volumes:
   sqlserver_data:
