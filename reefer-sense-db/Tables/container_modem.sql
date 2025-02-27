@@ -1,6 +1,6 @@
-﻿CREATE TABLE [dbo].[container-modem]
+﻿CREATE TABLE [dbo].[container_modem]
 (
-	[ident] INT NOT NULL PRIMARY KEY, 
+	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [container_ident] INT NOT NULL, 
     [modem_ident] INT NOT NULL, 
     [created_dt] DATETIME2 NOT NULL , 

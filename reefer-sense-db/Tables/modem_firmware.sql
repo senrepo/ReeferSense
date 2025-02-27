@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[modem-firmware]
+﻿CREATE TABLE [dbo].[modem_firmware]
 (
 	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [modem_ident] INT NOT NULL, 

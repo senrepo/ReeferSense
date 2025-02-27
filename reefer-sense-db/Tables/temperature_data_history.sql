@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[temperature-data-history]
+﻿CREATE TABLE [dbo].[temperature_data_history]
 (
 	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [container_ident] INT NOT NULL, 

@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[vessel-container]
+﻿CREATE TABLE [dbo].[vessel_container]
 (
 	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     [vessel_ident] INT NOT NULL, 
