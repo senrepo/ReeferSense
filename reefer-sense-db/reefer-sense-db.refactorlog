@@ -560,4 +560,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="container_id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="97dac664-7cbc-4340-8df8-eb2c5c078973" ChangeDateTime="02/28/2025 02:21:23">
+    <Property Name="ElementName" Value="[dbo].[temperature_data_history].[container_ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature_data_history]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container_id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d820cc2b-28fc-4273-8986-94fb6e8fa9e6" ChangeDateTime="02/28/2025 02:22:01">
+    <Property Name="ElementName" Value="[dbo].[temperature_data_latest].[container_ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[temperature_data_latest]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="container_id" />
+  </Operation>
 </Operations>

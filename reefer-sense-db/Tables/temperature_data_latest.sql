@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[temperature_data_latest]
 (
 	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
-    [container_ident] INT NOT NULL UNIQUE, 
+    [container_id] VARCHAR(12) NULL, 
     [modem_imei] VARCHAR(15) NULL, 
     [vessel_id] VARCHAR(25) NULL,
     [temperaturF] DECIMAL(5, 2) NULL, 
@@ -13,7 +13,7 @@
     [deforsting] BIT NULL, 
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received_dt] DATETIME2 NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT [FK_temperature-data-latest_container] FOREIGN KEY ([container_ident]) REFERENCES [container]([ident]), 
+    CONSTRAINT [FK_temperature-data-latest_container] FOREIGN KEY ([container_id]) REFERENCES [container](container_id), 
     CONSTRAINT [FK_temperature-data-latest_modem] FOREIGN KEY ([modem_imei]) REFERENCES [modem]([modem_imei]), 
     CONSTRAINT [FK_temperature-data-latest_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id])
 )

@@ -58,12 +58,12 @@
     <Folder Include="Properties" />
     <Folder Include="Tables" />
     <Folder Include="Seed Data" />
+    <Folder Include="Snapshots" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\container.sql" />
     <Build Include="Tables\modem.sql" />
     <Build Include="Tables\firmware.sql" />
-    <Build Include="Tables\container_modem.sql" />
     <Build Include="Tables\modem_firmware.sql" />
     <Build Include="Tables\company.sql" />
     <Build Include="Tables\user.sql" />
@@ -77,5 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
+    <None Include="Snapshots\reefer-sense-db_20250227_22-24-51.dacpac" />
   </ItemGroup>
 </Project>
