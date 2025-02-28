@@ -70,10 +70,8 @@
     <Build Include="Tables\temperature_data_latest.sql" />
     <Build Include="Tables\temperature_data_history.sql" />
     <Build Include="Tables\vessel.sql" />
-    <Build Include="Tables\vessel_container.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="reefer-sense-db.refactorlog" />
+    <Build Include="Tables\company_vessel.sql" />
+    <Build Include="Tables\company_modem.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />

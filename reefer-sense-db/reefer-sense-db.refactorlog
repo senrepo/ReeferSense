@@ -574,4 +574,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="container_id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="e4733828-6fdb-42ad-ae0c-af5dd3577f24" ChangeDateTime="02/28/2025 13:30:52">
+    <Property Name="ElementName" Value="[dbo].[company_modem].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[company_modem]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ident" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5e5993a4-7bda-409c-b602-3424f8c0b203" ChangeDateTime="02/28/2025 13:32:58">
+    <Property Name="ElementName" Value="[dbo].[company_vessel].[container_ident]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[company_vessel]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="company_ident" />
+  </Operation>
 </Operations>

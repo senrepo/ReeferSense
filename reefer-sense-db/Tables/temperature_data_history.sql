@@ -13,8 +13,8 @@
     [deforsting] BIT NULL, 
     [humidityPercent] SMALLINT NULL CHECK ([humidityPercent] BETWEEN 0 AND 100), 
     [received_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
-    CONSTRAINT [FK_temperature-data-history_container] FOREIGN KEY ([container_id]) REFERENCES [container]([container_id]), 
-    CONSTRAINT [FK_temperature-data-history_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id]), 
-    CONSTRAINT [FK_temperature-data-history_modem] FOREIGN KEY ([modem_imei]) REFERENCES [modem]([modem_imei])
+    CONSTRAINT [FK_temperature_data_history_container] FOREIGN KEY ([container_id]) REFERENCES [container]([container_id]), 
+    CONSTRAINT [FK_temperature_data_history_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id]), 
+    CONSTRAINT [FK_temperature_data_history_modem] FOREIGN KEY ([modem_imei]) REFERENCES [modem]([modem_imei])
 
 )

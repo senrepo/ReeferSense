@@ -53,18 +53,6 @@ BEGIN
 END
 
 
-IF OBJECT_ID('dbo.vessel_container', 'U') IS NOT NULL
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM dbo.vessel_container)
-    BEGIN
-        INSERT INTO dbo.vessel_container(vessel_ident, container_ident,created_dt) 
-        VALUES (1, '101 ' , GETDATE());
-    END
-END
-
-
-
-
 IF OBJECT_ID('dbo.modem_firmware', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.modem_firmware)
@@ -75,14 +63,28 @@ BEGIN
 END
 
 
-IF OBJECT_ID('dbo.container_modem', 'U') IS NOT NULL
+IF OBJECT_ID('dbo.company_modem', 'U') IS NOT NULL
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM dbo.container_modem)
+    IF NOT EXISTS (SELECT 1 FROM dbo.company_modem)
     BEGIN
-        INSERT INTO dbo.container_modem(container_ident, modem_ident, created_dt) 
-        VALUES (101,1,  GETDATE());
+        INSERT INTO dbo.company_modem(company_ident, modem_ident, firmware_ident ,created_dt) 
+        VALUES (1, 1,1 , GETDATE());
     END
 END
+
+
+
+IF OBJECT_ID('dbo.company_vessel', 'U') IS NOT NULL
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM dbo.company_vessel)
+    BEGIN
+        INSERT INTO dbo.company_vessel(company_ident, vessel_ident, firmware_ident ,created_dt) 
+        VALUES (1, 1,1 , GETDATE());
+    END
+END
+
+
+
 
 
 IF OBJECT_ID('dbo.temperature_data_latest', 'U') IS NOT NULL
