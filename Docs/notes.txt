@@ -5,3 +5,13 @@
 Azure Service Bus emulator
     https://learn.microsoft.com/en-us/azure/service-bus-messaging/overview-emulator
     https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script
+
+sql server docker
+    https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker
+
+Docker communities
+    comunity forums and slack, refer the bottom of the page
+    https://www.docker.com/support/
+
+Docker stackoverflow
+    https://stackoverflow.com/questions/tagged/docker
