@@ -1,8 +1,16 @@
 ﻿CREATE TABLE [dbo].[vessel]
 (
-	[ident] INT NOT NULL PRIMARY KEY, 
-	[company-ident] INT NOT NULL,
-	[vessel-id] VARCHAR(25) NOT NULL UNIQUE,
-    [vessel-name] VARCHAR(50) NOT NULL, 
-    CONSTRAINT [FK_vessel_company] FOREIGN KEY ([company-ident]) REFERENCES [company]([ident])
+	[ident] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
+	[vessel_id] VARCHAR(25) NOT NULL UNIQUE,
+    [vessel_name] VARCHAR(50) NOT NULL, 
+    [created_dt] DATETIME2 NOT NULL , 
+    [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
 )
+
+
+
+
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_vessel_vessel_id] ON [dbo].[vessel] ([vessel_id])

@@ -1,10 +1,17 @@
 ﻿CREATE TABLE [dbo].[modem]
 (
-	[ident] INT NOT NULL , 
-    [modem-imei] VARCHAR(15) NULL UNIQUE, 
+	[ident] INT IDENTITY(1,1) NOT NULL , 
+    [modem_imei] VARCHAR(15) NULL UNIQUE, 
     [model] VARCHAR(25) NOT NULL, 
     [manufacturer] VARCHAR(50) NOT NULL,
-    [created_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+    [created_dt] DATETIME2 NOT NULL , 
     [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     PRIMARY KEY ([ident]), 
 )
+
+
+
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_modem_modem_imei] ON [dbo].[modem] ([modem_imei])
