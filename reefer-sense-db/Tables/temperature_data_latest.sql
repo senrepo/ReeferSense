@@ -15,5 +15,6 @@
     [received_dt] DATETIME2 NOT NULL DEFAULT GETDATE(),
     CONSTRAINT [FK_temperature_data_latest_container] FOREIGN KEY ([container_id]) REFERENCES [container](container_id), 
     CONSTRAINT [FK_temperature_data_latest_modem] FOREIGN KEY ([modem_imei]) REFERENCES [modem]([modem_imei]), 
-    CONSTRAINT [FK_temperature_data_latest_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id])
+    CONSTRAINT [FK_temperature_data_latest_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id]),
+    CONSTRAINT [UQ_temperature_data_latest] UNIQUE ([container_id], [vessel_id], [modem_imei])
 )
