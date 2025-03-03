@@ -6,3 +6,15 @@
     [created_dt] DATETIME2 NOT NULL , 
     [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
 )
+
+
+
+
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_vessel_temperature_data_latest] ON [dbo].[vessel] ([vessel_id])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_vessel_temperature_data_history] ON [dbo].[vessel] ([vessel_id])

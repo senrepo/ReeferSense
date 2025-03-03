@@ -18,3 +18,15 @@
     CONSTRAINT [FK_temperature_data_latest_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id]),
     CONSTRAINT [UQ_temperature_data_latest] UNIQUE ([container_id], [vessel_id], [modem_imei])
 )
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_latest_Container] ON [dbo].[temperature_data_latest] ([Container_id])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_latest_modem] ON [dbo].[temperature_data_latest] ([modem_imei])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_latest_vessel] ON [dbo].[temperature_data_latest] ([vessel_id])

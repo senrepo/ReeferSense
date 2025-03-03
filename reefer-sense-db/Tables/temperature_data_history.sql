@@ -16,7 +16,20 @@
     CONSTRAINT [FK_temperature_data_history_container] FOREIGN KEY ([container_id]) REFERENCES [container]([container_id]), 
     CONSTRAINT [FK_temperature_data_history_vessel] FOREIGN KEY ([vessel_id]) REFERENCES [vessel]([vessel_id]), 
     CONSTRAINT [FK_temperature_data_history_modem] FOREIGN KEY ([modem_imei]) REFERENCES [modem]([modem_imei]),
-    CONSTRAINT [UQ_temperature_data_history] UNIQUE ([container_id], [vessel_id], [modem_imei],[logged_dt])
+    CONSTRAINT [UQ_temperature_data_history] UNIQUE ([container_id], [vessel_id], [modem_imei],[logged_dt]),
+    
 )
 
 
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_Container] ON [dbo].[temperature_data_history] ([container_id])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_vessel] ON [dbo].[temperature_data_history] ([vessel_id])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_modem] ON [dbo].[temperature_data_history] ([modem_imei])

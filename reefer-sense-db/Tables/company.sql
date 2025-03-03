@@ -4,4 +4,5 @@
     [company_name] VARCHAR(50) NOT NULL, 
     [created_dt] DATETIME2 NOT NULL , 
     [updated_dt] DATETIME2 NOT NULL DEFAULT GETDATE(), 
+
 )
