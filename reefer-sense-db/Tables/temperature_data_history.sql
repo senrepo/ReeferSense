@@ -24,12 +24,16 @@
 
 GO
 
-CREATE NONCLUSTERED INDEX [IX_temperature_data_history_Container] ON [dbo].[temperature_data_history] ([container_id])
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_container_id] ON [dbo].[temperature_data_history] ([container_id])
 
 GO
 
-CREATE NONCLUSTERED INDEX [IX_temperature_data_history_vessel] ON [dbo].[temperature_data_history] ([vessel_id])
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_vessel_id] ON [dbo].[temperature_data_history] ([vessel_id])
 
 GO
 
-CREATE NONCLUSTERED INDEX [IX_temperature_data_history_modem] ON [dbo].[temperature_data_history] ([modem_imei])
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_modem_imei] ON [dbo].[temperature_data_history] ([modem_imei])
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_temperature_data_history_logged_dt] ON [dbo].[temperature_data_history] ([logged_dt])

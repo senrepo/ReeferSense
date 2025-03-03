@@ -11,10 +11,7 @@
 
 
 
-GO
-
-CREATE NONCLUSTERED INDEX [IX_modem_temperature_data_latest] ON [dbo].[modem] ([modem_imei])
 
 GO
 
-CREATE NONCLUSTERED INDEX [IX_modem_temperature_data_history] ON [dbo].[modem] ([modem_imei])
+CREATE NONCLUSTERED INDEX [IX_modem_modem_imei] ON [dbo].[modem] ([modem_imei])

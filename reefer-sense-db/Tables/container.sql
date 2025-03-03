@@ -9,8 +9,7 @@
 )
 
 
+
 GO
 
-CREATE NONCLUSTERED INDEX [IX_container_temperature_data_latest] ON [dbo].[container] ([container_id])
-
-
+CREATE NONCLUSTERED INDEX [IX_container_container_id] ON [dbo].[container] ([container_id])
