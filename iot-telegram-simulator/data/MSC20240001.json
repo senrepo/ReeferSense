@@ -1,15 +1,12 @@
 {
-  "containerid": "MSC20240001",
-  "imei": "350123451234568",
-  "manufactor": "Mediterranean Shipping",
-  "model": "rmmw",
-  "frameworkVersion": "1.1",
-  "logged": null,
-  "power": "on",
-  "batteryPercent": 100,
-  "temperatureF": 25,
-  "defrosting": "no",
-  "humidityPercent": null,
-  "co2Percent": null,
-  "o2Percent": null
+  "containerId": "MSC20240001",
+  "modemImei": "350123451234568",
+  "temperatureF": "18",
+  "loggedDt": null,
+  "power": "1",
+  "batteryPercent": "80",
+  "co2Percent": "60",
+  "o2Percent": "40",
+  "defrosting": "0",
+  "humidityPercent": "20"
 }

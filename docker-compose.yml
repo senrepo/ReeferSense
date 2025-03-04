@@ -4,6 +4,20 @@ networks:
     driver: bridge
 
 services:
+
+  iot-data-processor:
+    container_name: "iot-data-processor"
+    image: ${DOCKER_REGISTRY-}iotdataprocessor
+    build:
+      context: .
+      dockerfile: iot-data-processor/Dockerfile
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - AppSettings__ServiceBus__ConnectionString=Endpoint=sb://sb-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      - AppSettings__ServiceBus__QueueName=iot-gateway-queue
+    networks:
+      - reefer-sense-network 
+
   iot-gateway:
     container_name: "iot-gateway"
     image: ${DOCKER_REGISTRY-}iotgateway

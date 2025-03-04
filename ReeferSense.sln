@@ -17,6 +17,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "reefer-sense-db", "reefer-sense-db\reefer-sense-db.sqlproj", "{4333AF8B-0024-43ED-8AFF-35830AE25E27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iot-data-processor", "iot-data-processor\iot-data-processor.csproj", "{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4333AF8B-0024-43ED-8AFF-35830AE25E27}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -92,7 +92,8 @@ namespace iot_telegram_simulator
                 {
                     string jsonContent = File.ReadAllText(filePath);
                     var json = JsonNode.Parse(jsonContent);
-                    json["logged"] = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    json["loggedDt"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    jsonContent = json.ToString();
                     hexString = ConvertToHex(jsonContent);
 
                 }
