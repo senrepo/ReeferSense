@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\sql-server-data-access\sql-server-data-access.csproj" />
+  </ItemGroup>
 </Project>

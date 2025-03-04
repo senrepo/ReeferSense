@@ -19,6 +19,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "reefer-sense-db", "reefer-s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iot-data-processor", "iot-data-processor\iot-data-processor.csproj", "{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sql-server-data-access", "sql-server-data-access\sql-server-data-access.csproj", "{C988D28B-8871-4495-B19A-84AD0008DD47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CB4B6D0-CD02-4A9F-8EA4-8EEEE3B9199F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C988D28B-8871-4495-B19A-84AD0008DD47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C988D28B-8871-4495-B19A-84AD0008DD47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C988D28B-8871-4495-B19A-84AD0008DD47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C988D28B-8871-4495-B19A-84AD0008DD47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
