@@ -65,7 +65,7 @@ namespace iot_telegram_simulator
                                 break;
                             }
 
-                            await Task.Delay(TimeSpan.FromSeconds(10));
+                            await Task.Delay(TimeSpan.FromSeconds(60));
                         }
                     }
                 }
@@ -74,7 +74,7 @@ namespace iot_telegram_simulator
                     _logger.LogError($"Error occurred: {ex.Message}. Attempting to reconnect...");
 
                     // Wait before trying to reconnect to avoid excessive retry attempts
-                    await Task.Delay(TimeSpan.FromSeconds(10));
+                    await Task.Delay(TimeSpan.FromSeconds(60));
                 }
             }
 
@@ -93,6 +93,7 @@ namespace iot_telegram_simulator
                     string jsonContent = File.ReadAllText(filePath);
                     var json = JsonNode.Parse(jsonContent);
                     json["loggedDt"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                    json["temperatureF"] = new Random().Next(20, 41).ToString();
                     jsonContent = json.ToString();
                     hexString = ConvertToHex(jsonContent);
 
