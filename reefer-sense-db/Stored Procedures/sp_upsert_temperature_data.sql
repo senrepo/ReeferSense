@@ -14,13 +14,21 @@ AS
 BEGIN
     BEGIN TRANSACTION;
     BEGIN TRY
-        
+        -- Validate input
+        IF @container_id IS NULL OR (@modem_imei IS NULL AND @vessel_id IS NULL)
+        BEGIN
+            RAISERROR ('Container Id cannot be null, and either Modem IMEI or Vessel ID should exist', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN -1;
+        END
+
+        -- Check if the record already exists
         IF EXISTS (
             SELECT 1 FROM dbo.temperature_data_history 
             WHERE container_id = @container_id 
-              AND modem_imei = @modem_imei 
-              AND vessel_id = @vessel_id 
-              AND logged_dt = @logged_dt
+              AND (modem_imei = @modem_imei OR (modem_imei IS NULL AND @modem_imei IS NULL)) 
+              AND (vessel_id = @vessel_id OR (vessel_id IS NULL AND @vessel_id IS NULL)) 
+              AND DATEDIFF(SECOND, logged_dt, @logged_dt) = 0  
               AND temperatureF = @temperatureF
               AND power = @power
               AND battery_percent = @battery_percent
@@ -30,20 +38,16 @@ BEGIN
               AND humidityPercent = @humidityPercent
         )
         BEGIN
-            
             PRINT 'Duplicate record found. No update or insert required.';
         END
         ELSE
         BEGIN
-            
+            -- Upsert into history table
             MERGE dbo.temperature_data_history AS target
-            USING (SELECT @container_id AS container_id, 
-                          @modem_imei AS modem_imei, 
-                          @vessel_id AS vessel_id,
-                          @logged_dt AS logged_dt) AS source
+            USING (SELECT @container_id AS container_id, @modem_imei AS modem_imei, @vessel_id AS vessel_id, @logged_dt AS logged_dt) AS source
             ON target.container_id = source.container_id 
-               AND target.modem_imei = source.modem_imei 
-               AND target.vessel_id = source.vessel_id
+               AND (target.modem_imei = source.modem_imei OR (target.modem_imei IS NULL AND source.modem_imei IS NULL))
+               AND (target.vessel_id = source.vessel_id OR (target.vessel_id IS NULL AND source.vessel_id IS NULL))
                AND target.logged_dt = source.logged_dt
             WHEN MATCHED THEN
                 UPDATE SET 
@@ -56,19 +60,15 @@ BEGIN
                     humidityPercent = @humidityPercent,
                     received_dt = GETDATE()
             WHEN NOT MATCHED THEN
-                INSERT (container_id, modem_imei, vessel_id, temperatureF, logged_dt, 
-                        power, battery_percent, co2_percent, o2_percent, deforsting, humidityPercent, received_dt)
-                VALUES (@container_id, @modem_imei, @vessel_id, @temperatureF, @logged_dt, 
-                        @power, @battery_percent, @co2_percent, @o2_percent, @deforsting, @humidityPercent, GETDATE());
+                INSERT (container_id, modem_imei, vessel_id, temperatureF, logged_dt, power, battery_percent, co2_percent, o2_percent, deforsting, humidityPercent, received_dt)
+                VALUES (@container_id, @modem_imei, @vessel_id, @temperatureF, @logged_dt, @power, @battery_percent, @co2_percent, @o2_percent, @deforsting, @humidityPercent, GETDATE());
 
-            
+            -- Upsert into latest table
             MERGE dbo.temperature_data_latest AS target
-            USING (SELECT @container_id AS container_id, 
-                          @modem_imei AS modem_imei, 
-                          @vessel_id AS vessel_id) AS source
+            USING (SELECT @container_id AS container_id, @modem_imei AS modem_imei, @vessel_id AS vessel_id) AS source
             ON target.container_id = source.container_id 
-               AND target.modem_imei = source.modem_imei 
-               AND target.vessel_id = source.vessel_id
+               AND (target.modem_imei = source.modem_imei OR (target.modem_imei IS NULL AND source.modem_imei IS NULL))
+               AND (target.vessel_id = source.vessel_id OR (target.vessel_id IS NULL AND source.vessel_id IS NULL))
             WHEN MATCHED THEN
                 UPDATE SET 
                     temperatureF = @temperatureF,
@@ -81,10 +81,8 @@ BEGIN
                     humidityPercent = @humidityPercent,
                     received_dt = GETDATE()
             WHEN NOT MATCHED THEN
-                INSERT (container_id, modem_imei, vessel_id, temperatureF, logged_dt, 
-                        power, battery_percent, co2_percent, o2_percent, deforsting, humidityPercent, received_dt)
-                VALUES (@container_id, @modem_imei, @vessel_id, @temperatureF, @logged_dt, 
-                        @power, @battery_percent, @co2_percent, @o2_percent, @deforsting, @humidityPercent, GETDATE());
+                INSERT (container_id, modem_imei, vessel_id, temperatureF, logged_dt, power, battery_percent, co2_percent, o2_percent, deforsting, humidityPercent, received_dt)
+                VALUES (@container_id, @modem_imei, @vessel_id, @temperatureF, @logged_dt, @power, @battery_percent, @co2_percent, @o2_percent, @deforsting, @humidityPercent, GETDATE());
         END
 
         COMMIT TRANSACTION;
@@ -92,15 +90,6 @@ BEGIN
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
-
-       
-        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
-        DECLARE @ErrorSeverity INT = ERROR_SEVERITY(); 
-        DECLARE @ErrorState INT = ERROR_STATE();
-
-        
-        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
-
-        RETURN -1;
+        THROW;
     END CATCH
-END
+END;
