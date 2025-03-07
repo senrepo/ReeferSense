@@ -8,9 +8,6 @@
 )
 
 
-
-
-
 GO
 
 CREATE NONCLUSTERED INDEX [IX_vessel_vessel_id] ON [dbo].[vessel] ([vessel_id])
