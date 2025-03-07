@@ -4,7 +4,7 @@
     [container_id] VARCHAR(12) NULL, 
     [modem_imei] VARCHAR(15) NULL, 
     [vessel_id] VARCHAR(25) NULL,
-    [temperaturF] DECIMAL(5, 2) NULL, 
+    [temperatureF] SMALLINT NULL, 
     [logged_dt] DATETIME2 NOT NULL,
     [power] BIT,
     [battery_percent] SMALLINT NULL CHECK ([battery_percent] BETWEEN 0 AND 100),

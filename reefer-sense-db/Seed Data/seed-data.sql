@@ -64,8 +64,6 @@ BEGIN
     END
 END
 
-select * from firmware
-
 
 IF OBJECT_ID('dbo.modem', 'U') IS NOT NULL
 BEGIN
@@ -142,30 +140,82 @@ IF OBJECT_ID('dbo.temperature_data_latest', 'U') IS NOT NULL
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM dbo.temperature_data_latest)
     BEGIN
-        INSERT INTO dbo.temperature_data_latest(container_id,modem_imei,temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id,@modem_imei,  25.50,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
-		 INSERT INTO dbo.temperature_data_latest(container_id,vessel_id, temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id, @vessel_id, 28.50,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
-    END
-END
+  --      INSERT INTO dbo.temperature_data_latest(container_id,modem_imei,temperatureF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
+  --      VALUES (@container_id,@modem_imei,  25,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
+  --	  INSERT INTO dbo.temperature_data_latest(container_id,vessel_id, temperatureF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
+  --      VALUES (@container_id, @vessel_id, 28,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
 
-IF OBJECT_ID('dbo.temperature_data_history', 'U') IS NOT NULL
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM dbo.temperature_data_history)
-    BEGIN
-        INSERT INTO dbo.temperature_data_history(container_id,modem_imei,temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id,@modem_imei,  25.50,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
-		        INSERT INTO dbo.temperature_data_history(container_id,vessel_id, temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id, @vessel_id, 29.50,GETDATE()-1, 1, 100, Null, Null, 0,60, GETDATE());
+		DECLARE	@return_value int
+		DECLARE @date DATETIME2(7) = GETDATE()
 
-        INSERT INTO dbo.temperature_data_history(container_id,modem_imei,temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id,@modem_imei,  35.50,GETDATE()-2, 1, 100, Null, Null, 0,60, GETDATE());
-		INSERT INTO dbo.temperature_data_history(container_id,vessel_id, temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
-        VALUES (@container_id,@vessel_id, 8.50,GETDATE()-3, 1, 100, Null, Null, 0,60, GETDATE());
+		-- iot telegram data
+		EXEC @return_value = [dbo].[sp_upsert_temperature_data]
+			@container_id = @container_id,
+			@modem_imei = @modem_imei,
+			@vessel_id = NULL,
+			@temperatureF = 25,
+			@logged_dt = @date,
+			@power = 1,
+			@battery_percent = 100,
+			@co2_percent = NULL,
+			@o2_percent = NULL,
+			@deforsting = 0,
+			@humidityPercent = 60
+		 IF @return_value = 1 PRINT 'Record inserted'
+
+		 --iot telegram data
+		 SELECT @date = GETDATE();
+		 EXEC @return_value = [dbo].[sp_upsert_temperature_data]
+			@container_id = @container_id,
+			@modem_imei = @modem_imei,
+			@vessel_id = NULL,
+			@temperatureF = 28,
+			@logged_dt = @date,
+			@power = 1,
+			@battery_percent = 80,
+			@co2_percent = NULL,
+			@o2_percent = NULL,
+			@deforsting = 1,
+			@humidityPercent = 85
+		IF @return_value = 1 PRINT 'Record inserted'
+
+		 --vessel telegram data
+		 SELECT @date = GETDATE();
+		 EXEC @return_value = [dbo].[sp_upsert_temperature_data]
+			@container_id = @container_id,
+			@modem_imei = NULL,
+			@vessel_id = @vessel_id,
+			@temperatureF = 32,
+			@logged_dt = @date,
+			@power = 1,
+			@battery_percent = 80,
+			@co2_percent = NULL,
+			@o2_percent = NULL,
+			@deforsting = 1,
+			@humidityPercent = 85
+		IF @return_value = 1 PRINT 'Record inserted'
+
+		 --vessel telegram data
+		 SELECT @date = GETDATE();
+		 EXEC @return_value = [dbo].[sp_upsert_temperature_data]
+			@container_id = @container_id,
+			@modem_imei = NULL,
+			@vessel_id = @vessel_id,
+			@temperatureF = 35,
+			@logged_dt = @date,
+			@power = 1,
+			@battery_percent = 80,
+			@co2_percent = NULL,
+			@o2_percent = NULL,
+			@deforsting = 1,
+			@humidityPercent = 85
+		IF @return_value = 1 PRINT 'Record inserted'
+
     END
 END
 
 GO
+
 
 -- query temperature_data_latest
 select 
@@ -177,7 +227,7 @@ select
 	m.model, 
 	m.manufacturer, 
 	f.firmware_version, 
-	tdl.temperaturF, 
+	tdl.temperatureF, 
 	tdl.co2_percent, 
 	tdl.deforsting, 
 	tdl.humidityPercent, 
@@ -208,7 +258,7 @@ select
 	m.model, 
 	m.manufacturer, 
 	f.firmware_version, 
-	tdh.temperaturF, 
+	tdh.temperatureF, 
 	tdh.co2_percent, 
 	tdh.deforsting, 
 	tdh.humidityPercent, 

@@ -58,7 +58,7 @@
     <Folder Include="Properties" />
     <Folder Include="Tables" />
     <Folder Include="Seed Data" />
-    <Folder Include="Snapshots" />
+    <Folder Include="Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\container.sql" />
@@ -72,9 +72,10 @@
     <Build Include="Tables\vessel.sql" />
     <Build Include="Tables\company_vessel.sql" />
     <Build Include="Tables\company_modem.sql" />
+    <Build Include="Stored Procedures\sp_upsert_temperature_data.sql" />
+    <Build Include="Stored Procedures\sp_upsert_company.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
-    <None Include="Snapshots\reefer-sense-db_20250227_22-24-51.dacpac" />
   </ItemGroup>
 </Project>
