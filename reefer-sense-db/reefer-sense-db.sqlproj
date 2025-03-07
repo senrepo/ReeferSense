@@ -78,7 +78,4 @@
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="reefer-sense-db.refactorlog" />
-  </ItemGroup>
 </Project>
