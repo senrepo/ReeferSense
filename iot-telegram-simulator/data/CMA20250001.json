@@ -1,15 +1,12 @@
 {
-  "containerid": "CMA20250001",
-  "imei": "350123451234560",
-  "manufactor": "CMA CGM",
-  "model": "rmmw",
-  "frameworkVersion": "1.1",
-  "logged": null,
-  "power": "on",
-  "batteryPercent": 100,
-  "temperatureF": 25,
-  "defrosting": "no",
-  "humidityPercent": null,
+  "containerId": "CMA20250001",
+  "modemImei": "350123451234560",
+  "temperatureF": "25",
+  "loggedDt": null,
+  "power": "1",
+  "batteryPercent": "100",
   "co2Percent": null,
-  "o2Percent": null
+  "o2Percent": null,
+  "defrosting": "1",
+  "humidityPercent": null
 }
