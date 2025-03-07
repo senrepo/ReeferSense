@@ -92,8 +92,6 @@ ELSE PRINT 'Failure: Insert test case failed';
 Scenario 2: Try inserting an existing vessel
 Expected: Update existing record (returns 1)
 */
-
-
 EXEC	@return_value = [dbo].[sp_upsert_vessel]
 		@vessel_id = 'MSCVSL002',
 		@vessel_name = 'MSC PACIFIC REEFER',
@@ -104,27 +102,22 @@ ELSE PRINT 'Failure: update test case failed';
 
 
 /*
-Scenario 3: Update an existing vessel using vessel 
+Scenario 3: Update an existing vessel using vessel_id 
 Expected: Success (returns 1)
 */
-
+EXEC	@return_value = [dbo].[sp_upsert_vessel]
+		@vessel_id = 'MSCVSL002',
+		@vessel_name = 'MSC REEFER',
+		@vessel_ident = NULL
+IF @return_value = 1 PRINT 'Success: Updated a new vessel';
+ELSE PRINT 'Failure: update test case failed';
+--SELECT	'Return Value' = @return_value
 
 
 /*
 Scenario 4: Try updating a non-existent vessel_ident 
 Expected: Failure (returns 0)
 */
-
-EXEC	@return_value = [dbo].[sp_upsert_vessel]
-		@vessel_id = 'MSCVSL002',
-		@vessel_name = 'MSC PACIFIC REEFER',
-		@vessel_ident = NULL
-IF @return_value = 1 PRINT 'Success: Updated a new vessel';
-ELSE PRINT 'Failure: update test case failed';
---SELECT	'Return Value' = @return_value
-
-
-
 EXEC	@return_value = [dbo].[sp_upsert_vessel]
 		@vessel_id = N'MSCVSL002',
 		@vessel_name = N'Unknown Vessel',
@@ -151,5 +144,5 @@ SELECT	'Return Value' = @return_value
 
 
 -- Cleanup: Remove test data 
-DELETE FROM dbo.vessel WHERE vessel_name in ('MSC PACIFIC REEFER', 'Unknown Corp');
+DELETE FROM dbo.vessel WHERE vessel_name in ('MSC PACIFIC REEFER', 'Unknown Corp', 'MSC REEFER');
 Go
