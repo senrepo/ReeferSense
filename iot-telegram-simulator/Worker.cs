@@ -12,27 +12,25 @@ namespace iot_telegram_simulator
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _config;
         private readonly IHostEnvironment _env;
-        private readonly string _serverAddress;
-        private readonly int _port;
 
         public Worker(ILogger<Worker> logger, IConfiguration config, IHostEnvironment env)
         {
             _logger = logger;
             _config = config;
             _env = env;
-
-            _serverAddress = _config["AppSettings:IotGatewayServer"];
-            _port = int.Parse(_config["AppSettings:Port"]);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var serverAddress = _config["AppSettings:IotGatewayServer"];
+            var port = int.Parse(_config["AppSettings:Port"]);
+
             string fileName = string.Empty;
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    using (TcpClient client = new TcpClient(_serverAddress, _port))
+                    using (TcpClient client = new TcpClient(serverAddress, port))
                     using (NetworkStream stream = client.GetStream())
                     {
                         _logger.LogInformation("Connected to server.");

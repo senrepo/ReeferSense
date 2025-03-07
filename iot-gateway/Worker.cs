@@ -10,16 +10,14 @@ namespace iot_gateway
         private const int Port = 9000;
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _config;
-        private readonly string _serviceBusConnectionString;
-        private readonly string _queueName;
         private ServiceBusClient _client;
         private ServiceBusSender _sender;
 
         public Worker(ILogger<Worker> logger, IConfiguration config)
         {
             _logger = logger;
-            _serviceBusConnectionString = config["AppSettings:ServiceBus:ConnectionString"];
-            _queueName = config["AppSettings:ServiceBus:QueueName"];
+            _config = config;
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,6 +36,15 @@ namespace iot_gateway
             }
 
             await Task.CompletedTask;
+        }
+
+        private void CreateServiceBusConnection()
+        {
+            var servicebusConnString = _config["AppSettings:ServiceBus:ConnectionString"];
+            var queueName = _config["AppSettings:ServiceBus:QueueName"];
+
+            _client = new ServiceBusClient(servicebusConnString);
+            _sender = _client.CreateSender(queueName);
         }
 
         private async Task HandleClientAsync(TcpClient client)
@@ -94,8 +101,7 @@ namespace iot_gateway
         {
             if(_client == null)
             {
-                _client = new ServiceBusClient(_serviceBusConnectionString);
-                _sender = _client.CreateSender(_queueName);
+                CreateServiceBusConnection();
             }
 
             try

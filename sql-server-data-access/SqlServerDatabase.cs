@@ -8,9 +8,9 @@ namespace sql_server_data_access
     {
         private readonly string connectionString = string.Empty;
 
-        public SqlServerDatabase(IConfiguration configuration)
+        public SqlServerDatabase(string connectionString)
         {
-            connectionString = configuration.GetSection("DatabaseConfiguration")["ConnectionString"];
+            this.connectionString = connectionString;
         }
 
         public override IDbConnection CreateDBConnection()

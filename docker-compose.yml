@@ -15,8 +15,13 @@ services:
       - DOTNET_ENVIRONMENT=Development
       - AppSettings__ServiceBus__ConnectionString=Endpoint=sb://sb-emulator;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
       - AppSettings__ServiceBus__QueueName=iot-gateway-queue
+      - AppSettings__SqlServer__ConnectionString=Server=sqlserver,1433;Database=ReeferSense;User Id=sa;Password=ReeferSense@2025;Encrypt=True;TrustServerCertificate=True;
     networks:
       - reefer-sense-network 
+    depends_on:
+      - sb-emulator
+      - sqlserver
+
 
   iot-gateway:
     container_name: "iot-gateway"
@@ -30,6 +35,9 @@ services:
       - AppSettings__ServiceBus__QueueName=iot-gateway-queue
     networks:
       - reefer-sense-network 
+    depends_on:
+      - sb-emulator
+
 
   iot-telegram-simulator:
     container_name: "iot-telegram-simulator"
@@ -45,6 +53,8 @@ services:
       - ./iot-telegram-simulator/data:/app/data
     networks:
       - reefer-sense-network 
+    depends_on:
+      - iot-gateway
 
   sb-emulator:
     container_name: "servicebus-emulator"
@@ -57,10 +67,11 @@ services:
       SQL_SERVER: sqledge  
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
       ACCEPT_EULA: ${ACCEPT_EULA}
-    depends_on:
-      - sqledge
     networks:
       - reefer-sense-network
+    depends_on:
+      - sqledge
+
 
   sqledge:
     container_name: "sqledge"
@@ -70,6 +81,7 @@ services:
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
     networks:
       - reefer-sense-network
+
 
   sqlserver:
     container_name: reefer-sense-sqlserver
@@ -84,6 +96,7 @@ services:
     restart: always
     networks:
       - reefer-sense-network 
+
 
 volumes:
   sqlserver_data:
