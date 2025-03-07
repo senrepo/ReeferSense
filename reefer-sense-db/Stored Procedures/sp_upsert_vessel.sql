@@ -122,12 +122,8 @@ EXEC	@return_value = [dbo].[sp_upsert_vessel]
 		@vessel_id = N'MSCVSL002',
 		@vessel_name = N'Unknown Vessel',
 		@vessel_ident = -23;
-	IF @return_value = 0 PRINT 'SUCCESS'
-	ELSE PRINT 'FAILURE'
-
-SELECT	'Return Value' = @return_value
-
-
+IF @return_value = 0 PRINT 'SUCCESS'
+ELSE PRINT 'FAILURE'
 
 
 /*
@@ -140,7 +136,6 @@ EXEC	@return_value = [dbo].[sp_upsert_vessel]
 		@vessel_ident = NULL
 
 SELECT	'Return Value' = @return_value
-
 
 
 -- Cleanup: Remove test data 

@@ -75,6 +75,7 @@
     <Build Include="Stored Procedures\sp_upsert_temperature_data.sql" />
     <Build Include="Stored Procedures\sp_upsert_company.sql" />
     <Build Include="Stored Procedures\sp_upsert_vessel.sql" />
+    <Build Include="Stored Procedures\sp_upsert_container.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
