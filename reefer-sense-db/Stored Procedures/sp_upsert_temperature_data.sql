@@ -19,6 +19,7 @@ BEGIN
         BEGIN
             PRINT 'Container Id cannot be null, and either Modem IMEI or Vessel ID should exist';
             ROLLBACK TRANSACTION;
+            SELECT -1 AS Result;
             RETURN -1;
         END
 
@@ -40,6 +41,7 @@ BEGIN
         BEGIN
             PRINT 'Duplicate record found. No update or insert required.';
             ROLLBACK TRANSACTION;
+            SELECT 0 AS Result;
             RETURN 0;
         END
         ELSE
@@ -88,6 +90,7 @@ BEGIN
         END
 
         COMMIT TRANSACTION;
+        SELECT 1 AS Result;
         RETURN 1;
     END TRY
     BEGIN CATCH
@@ -240,5 +243,10 @@ EXEC @return_value = sp_upsert_temperature_data
 
 IF @return_value = -1 PRINT 'Success: Scenario 7 - Validation failed for missing Modem IMEI and Vessel ID';
 ELSE PRINT 'Failure: Scenario 7 - Validation did not trigger for missing identifiers';
+
+
+-- Cleanup: Remove test data 
+DELETE FROM dbo.temperature_data_history WHERE container_id = 'CMA202400011' or modem_imei = '350123451234560';
+DELETE FROM dbo.temperature_data_latest WHERE container_id = 'CMA202400011' or modem_imei = '350123451234560';
 
 GO

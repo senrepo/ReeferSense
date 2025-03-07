@@ -10,8 +10,6 @@ namespace iot_data_processor
     {
         private readonly ILogger<Worker> _logger;
         private readonly IConfiguration _config;
-        private readonly string _serviceBusConnectionString;
-        private readonly string _queueName;
 
         private ServiceBusClient _client;
         private ServiceBusProcessor _processor;
@@ -26,19 +24,18 @@ namespace iot_data_processor
         public Worker(ILogger<Worker> logger, IConfiguration config)
         {
             _logger = logger;
-            _serviceBusConnectionString = config["AppSettings:ServiceBus:ConnectionString"];
-            _queueName = config["AppSettings:ServiceBus:QueueName"];
+            _config = config;
 
-            _client = new ServiceBusClient(_serviceBusConnectionString);
-            _processor = _client.CreateProcessor(_queueName, new ServiceBusProcessorOptions {
-                AutoCompleteMessages = false
-            });
-
-            _sensorDataProcessor = new SensorDataProcessor();
+            _sensorDataProcessor = new SensorDataProcessor(logger, config);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            if(_processor == null || _client == null)
+            {
+                CreateServiceBusConnection();
+            }
+
             _processor.ProcessMessageAsync += ProcessMessageHandler;
             _processor.ProcessErrorAsync += ErrorHandler;
 
@@ -48,6 +45,18 @@ namespace iot_data_processor
             {
                 await _processor.StopProcessingAsync(stoppingToken);
             }
+        }
+
+        private void CreateServiceBusConnection()
+        {
+            var serviceBusConnectionString = _config["AppSettings:ServiceBus:ConnectionString"];
+            var queueName = _config["AppSettings:ServiceBus:QueueName"];
+
+            _client = new ServiceBusClient(serviceBusConnectionString);
+            _processor = _client.CreateProcessor(queueName, new ServiceBusProcessorOptions
+            {
+                AutoCompleteMessages = false
+            });
         }
 
         private async Task ProcessMessageHandler(ProcessMessageEventArgs args)

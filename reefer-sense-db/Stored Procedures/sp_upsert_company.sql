@@ -12,7 +12,8 @@ BEGIN
         BEGIN
             PRINT 'Company name cannot be null.';
             ROLLBACK TRANSACTION;
-            RETURN -1;  -- Indicating an error
+            SELECT -1 AS Result;
+            RETURN -1;
         END
 
         -- If @company_ident is NULL, check if the company exists based on @company_name
@@ -47,12 +48,14 @@ BEGIN
             BEGIN
                 -- If @company_ident does not exist, return 0 indicating no operation performed
                 ROLLBACK TRANSACTION;
+                SELECT 0 AS Result;
                 RETURN 0;
             END
         END
 
         -- If everything succeeds, commit the transaction
         COMMIT TRANSACTION;
+        SELECT 1 AS Result;
         RETURN 1;
 
     END TRY
@@ -124,5 +127,9 @@ EXEC @return_value = sp_upsert_company
 
 IF @return_value = -1 PRINT 'Success: Scenario 5 - Validation error triggered for NULL company_name';
 ELSE PRINT 'Failure: Scenario 5 - NULL company_name validation did not work';
+
+
+-- Cleanup: Remove test data 
+DELETE FROM dbo.company WHERE company_name in ('Titan Corp', 'Titan Global', 'Unknown Corp');
 
 GO
