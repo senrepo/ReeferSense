@@ -126,6 +126,7 @@ IF @return_value = 0 PRINT 'SUCCESS'
 ELSE PRINT 'FAILURE'
 
 
+
 /*
 Scenario 5: Try inserting a Vessel with NULL name 
 Expected: Failure (returns -1)
