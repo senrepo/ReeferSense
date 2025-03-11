@@ -27,7 +27,7 @@ BEGIN
     BEGIN
         SELECT @existing_ident = @modem_ident 
         FROM modem
-        WHERE modem_imei = @modem_imei AND model = @model AND manufacturer = @manufacturer;
+        WHERE modem_imei = @modem_imei;
 
         IF @existing_ident IS NOT NULL
         BEGIN
