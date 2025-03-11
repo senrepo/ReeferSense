@@ -133,10 +133,11 @@ EXEC @return_value = [dbo].[sp_upsert_container]
 IF @return_value = -1 PRINT 'Success';
 ELSE PRINT 'Failure'
 --SELECT	'Return Value' = @return_value
-GO
+
 
 -- Cleanup: Remove test data 
-
+DELETE FROM dbo.container WHERE container_id in ('CMA202400022');
+GO
 
 
 
