@@ -24,7 +24,7 @@ BEGIN
         BEGIN
             SELECT @existing_user_ident = @user_ident 
             FROM dbo.[user]
-            WHERE user_id = @user_id AND first_name = @first_name AND last_name = @last_name;
+            WHERE user_id = @user_id ;
         END
 
         IF @existing_user_ident IS NOT NULL
