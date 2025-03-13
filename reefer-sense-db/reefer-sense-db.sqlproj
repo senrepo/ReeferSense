@@ -77,6 +77,7 @@
     <Build Include="Stored Procedures\sp_upsert_vessel.sql" />
     <Build Include="Stored Procedures\sp_upsert_container.sql" />
     <Build Include="Stored Procedures\sp_upsert_modem.sql" />
+    <Build Include="Stored Procedures\sp_upsert_user.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
