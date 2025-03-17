@@ -26,10 +26,10 @@ BEGIN
 
         DECLARE @existing_company_modem_ident INT;
 
-        -- If @company_modem_ident is NULL, check if the entry exists
+        -- Check if the entry already exists
         IF @company_modem_ident IS NULL
         BEGIN
-            SELECT @existing_company_modem_ident = @company_modem_ident
+            SELECT @existing_company_modem_ident = @company_modem_ident  
             FROM dbo.company_modem
             WHERE company_ident = @company_ident AND modem_ident = @modem_ident;
         END
@@ -44,22 +44,25 @@ BEGIN
             UPDATE dbo.company_modem
             SET company_ident = @company_ident,
                 modem_ident = @modem_ident
-            WHERE @company_modem_ident = @existing_company_modem_ident;
+            WHERE @company_modem_ident = @existing_company_modem_ident; 
         END
         ELSE
         BEGIN
-            -- Insert new record
+            DECLARE @InsertedId TABLE (company_modem_ident INT);
+
+            -- Insert new record and capture the new ID
             INSERT INTO dbo.company_modem (company_ident, modem_ident, created_dt)
+            OUTPUT INSERTED.ident INTO @InsertedId
             VALUES (@company_ident, @modem_ident, GETDATE());
 
             -- Retrieve the newly inserted ID
-            SET @existing_company_modem_ident = SCOPE_IDENTITY();
+            SET @existing_company_modem_ident = (SELECT company_modem_ident FROM @InsertedId);
         END
 
         -- Commit transaction and return ID
         COMMIT TRANSACTION;
-        SELECT @existing_company_modem_ident AS company_modem_ident;
-        RETURN 1;
+          SELECT @existing_company_modem_ident = @company_modem_ident FROM dbo.company_modem;
+RETURN 1;
     END TRY
     BEGIN CATCH
         ROLLBACK TRANSACTION;
