@@ -80,6 +80,7 @@
     <Build Include="Stored Procedures\sp_upsert_user.sql" />
     <Build Include="Stored Procedures\sp_upsert_company_vessel.sql" />
     <Build Include="Stored Procedures\sp_upsert_company_modem.sql" />
+    <Build Include="Stored Procedures\sp_upsert_modem_firmware.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
