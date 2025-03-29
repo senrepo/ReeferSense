@@ -88,6 +88,8 @@
     <Build Include="Stored Procedures\sp_get_user.sql" />
     <Build Include="Stored Procedures\sp_get_modem.sql" />
     <Build Include="Stored Procedures\sp_get_company_vessel.sql" />
+    <Build Include="Stored Procedures\sp_get_company_modem.sql" />
+    <Build Include="Stored Procedures\sp_get_modem_firmware.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
