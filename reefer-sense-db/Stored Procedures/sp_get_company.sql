@@ -2,9 +2,7 @@
     @company_ident INT = NULL
 AS
 BEGIN
-    BEGIN TRANSACTION;
 
-    BEGIN TRY
         -- Get/Retrieve company details
         IF @company_ident IS NULL
         BEGIN
@@ -15,8 +13,6 @@ BEGIN
                 created_dt AS CreatedDate,
                 updated_dt AS UpdatedDate
             FROM dbo.company;
-            COMMIT TRANSACTION;
-            RETURN;
         END
         ELSE
         BEGIN
@@ -30,21 +26,13 @@ BEGIN
                 updated_dt AS UpdatedDate
             FROM dbo.company
             WHERE ident = @company_ident;
-            COMMIT TRANSACTION;
         END
         ELSE
         BEGIN
             PRINT 'Invalid company_ident. Company does not exist.';
-            ROLLBACK TRANSACTION;
             SELECT 0 AS RESULT;
         END
     END
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        PRINT ERROR_MESSAGE();
-        SELECT -1 AS RESULT;
-    END CATCH;
 END;
 
 

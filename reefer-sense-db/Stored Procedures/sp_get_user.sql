@@ -58,8 +58,6 @@ CREATE PROCEDURE [dbo].[sp_get_user]
     @user_id VARCHAR(50) = NULL
 AS
 BEGIN
-    BEGIN TRANSACTION; 
-    BEGIN TRY
         -- If container_id exist (failed as 0)
         IF NOT EXISTS (SELECT 1 FROM dbo.[user] WHERE user_id = @user_id)
         BEGIN
@@ -79,14 +77,6 @@ BEGIN
 				updated_dt AS UpdatedDate
 			FROM dbo.[user]
 			WHERE user_id = @user_id;
-         ROLLBACK TRANSACTION;
         SELECT 1 AS RESULT;
-        COMMIT TRANSACTION;
 
-    END TRY
-    BEGIN CATCH
-     ROLLBACK TRANSACTION;
-        PRINT ERROR_MESSAGE();
-        SELECT -1 AS RESULT;
-    END CATCH;
 END;

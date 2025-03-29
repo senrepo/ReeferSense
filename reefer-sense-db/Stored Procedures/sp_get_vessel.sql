@@ -2,7 +2,6 @@
     @vessel_id VARCHAR(25) = NULL
 AS
 BEGIN
-    BEGIN TRY
         -- Retrieve all vessels if vessel_id is not provided (If No vessel_id Provided)
         IF @vessel_id IS NULL
         BEGIN
@@ -38,11 +37,6 @@ BEGIN
                 SELECT 1 AS RESULT;
             END
         END
-    END TRY
-    BEGIN CATCH
-       PRINT 'An error occurred: ' + ERROR_MESSAGE();
-      SELECT -1 AS RESULT;
-    END CATCH
 END;
 
 

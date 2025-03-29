@@ -2,7 +2,6 @@
     @container_id VARCHAR(12) = NULL
 AS
 BEGIN
-    BEGIN TRY
         -- Retrieve all containers if no container_id is provided
         IF @container_id IS NULL
         BEGIN
@@ -38,12 +37,7 @@ BEGIN
                 SELECT 1 AS RESULT;
             END
         END
-    END TRY
-    BEGIN CATCH
-        -- Handle any errors
-        PRINT 'An error occurred: ' + ERROR_MESSAGE();
-        SELECT -1 AS RESULT;
-    END CATCH
+ 
 END;
 
 
