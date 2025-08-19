@@ -11,13 +11,11 @@
   <ItemGroup>
     <Content Remove="data\CMA20250001.json" />
     <Content Remove="data\MSC20240001.json" />
-    <Content Remove="data\TIT20250003.json" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="data\CMA20250001.json" />
     <None Include="data\MSC20240001.json" />
-    <None Include="data\TIT20250003.json" />
   </ItemGroup>
 
   <ItemGroup>

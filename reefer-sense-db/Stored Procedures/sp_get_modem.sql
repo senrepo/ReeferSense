@@ -2,7 +2,7 @@
     @modem_imei VARCHAR(15) = NULL
 AS
 BEGIN
-    --BEGIN TRY
+    BEGIN TRY
         -- Retrieve all modems if no modem_imei is provided
         IF @modem_imei IS NULL
         BEGIN
@@ -42,12 +42,11 @@ BEGIN
                 SELECT 1 AS RESULT;
             END
         END
-    --END TRY
-    --BEGIN CATCH
-    --     Handle any errors
-    --    PRINT 'An error occurred: ' + ERROR_MESSAGE();
-    --    SELECT -1 AS RESULT;
-    --END CATCH
+    END TRY
+    BEGIN CATCH
+        PRINT 'An error occurred: ' + ERROR_MESSAGE();
+        SELECT -1 AS RESULT;
+    END CATCH
 END;
 
 
