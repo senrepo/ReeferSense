@@ -90,6 +90,8 @@
     <Build Include="Stored Procedures\sp_get_company_vessel.sql" />
     <Build Include="Stored Procedures\sp_get_company_modem.sql" />
     <Build Include="Stored Procedures\sp_get_modem_firmware.sql" />
+    <Build Include="Stored Procedures\sp_onboard_company_container_modem.sql" />
+    <Build Include="Stored Procedures\sp_cleanup_company_container_modem.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Seed Data\seed-data.sql" />
