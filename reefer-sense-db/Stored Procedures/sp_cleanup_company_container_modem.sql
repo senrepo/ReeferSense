@@ -107,9 +107,4 @@ EXEC [dbo].[sp_cleanup_company_container_modem]
      @input_container_id = 'MSC20240001',
      @input_imei_no = '350123451234568';
 
-EXEC [dbo].[sp_cleanup_company_container_modem]
-	@input_company_name = 'Titan Shipping',
-	@input_container_id = 'TIT202500031',
-	@input_imei_no = '350123451234575';
-
 
