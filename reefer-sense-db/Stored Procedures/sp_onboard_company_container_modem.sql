@@ -81,10 +81,6 @@ END;
 /* TEST CASE */
 EXEC [dbo].[sp_onboard_company_container_modem]
      @input_company_name = 'MSC Global',
-     @input_container_id = 'MSC20240001',
+     @input_container_id = 'MSC202400001',
      @input_imei_no = '350123451234568';
 
-EXEC [dbo].[sp_onboard_company_container_modem]
-	@input_company_name = 'Titan Shipping',
-	@input_container_id = 'TIT202500031',
-	@input_imei_no = '350123451234575';
