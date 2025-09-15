@@ -14,7 +14,7 @@ pr:
   paths:
     include:
       - iot-gateway/**
-      - Dockerfile.iogw
+      - Dockerfile
       - pipelines/iot-gateway/**
       - pipelines/templates/**
 
@@ -40,7 +40,7 @@ stages:
 - stage: Build
   displayName: Build iot-gateway (Dev)
   jobs:
-  - template: pipelines/templates/build-dotnet.yml   # <- path from repo root
+  - template: ../templates/build-dotnet.yml   # <- path from repo root
     parameters:
       solution: $(solution)
       project: $(project)
@@ -52,7 +52,7 @@ stages:
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
-  - template: pipelines/templates/docker-buildpush.yml
+  - template: ../templates/docker-buildpush.yml
     parameters:
       containerRegistryServiceConnection: acrServiceConnection
       repository: $(imageName)
