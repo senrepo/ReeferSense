@@ -1,8 +1,12 @@
+# /pipelines/templates/docker-buildpush.yml
 parameters:
   containerRegistryServiceConnection: ''   # e.g., 'acr-dev'
   repository: ''                           # e.g., 'iot-gateway'
   dockerfilePath: ''                       # e.g., 'Dockerfile.iogw'
-  contextFromPublish: true
+  buildContext: '$(Pipeline.Workspace)/publish/app'   # default context from publish
+  tags: |
+    $(Build.SourceBranchName)-$(Build.BuildId)
+    $(Build.SourceBranchName)-latest
 
 jobs:
 - job: docker_build_push
@@ -16,19 +20,14 @@ jobs:
     displayName: Login to ACR
     inputs:
       command: login
-      containerRegistry: '${{ parameters.containerRegistryServiceConnection }}'
+      containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
 
   - task: Docker@2
     displayName: Build & Push
     inputs:
       command: buildAndPush
-      repository: '${{ parameters.repository }}'
-      containerRegistry: '${{ parameters.containerRegistryServiceConnection }}'
-      Dockerfile: '${{ parameters.dockerfilePath }}'
-      buildContext: ${{ if eq(parameters.contextFromPublish, true) }}:
-        '$(Pipeline.Workspace)/publish/app'
-      ${{ if ne(parameters.contextFromPublish, true) }}:
-        '.'
-      tags: |
-        $(Build.SourceBranchName)-$(Build.BuildId)
-        $(Build.SourceBranchName)-latest
+      repository: ${{ parameters.repository }}
+      containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
+      Dockerfile: ${{ parameters.dockerfilePath }}
+      buildContext: ${{ parameters.buildContext }}
+      tags: ${{ parameters.tags }}

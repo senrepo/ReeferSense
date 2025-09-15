@@ -1,4 +1,5 @@
-# Trigger only when this project or its infra files change
+﻿# /pipelines/iot-gateway/azure-pipelines-dev.yml
+
 trigger:
   branches: { include: [ dev ] }
   paths:
@@ -17,46 +18,66 @@ pr:
       - pipelines/iot-gateway/**
       - pipelines/templates/**
 
-# Pull this project's dev config
+# Load env-level first, then project-level (project overrides env on key collisions)
 variables:
-- group: iot-gateway-dev-config
-- name: imageName
-  value: iot-gateway
+- group: env-dev
+- group: iot-gateway-dev
+
+# Repo-specific values
 - name: solution
   value: ReeferSense.sln
 - name: project
   value: iot-gateway/iot-gateway.csproj
 - name: dockerfilePath
   value: Dockerfile.iogw
+- name: imageName
+  value: iot-gateway
+- name: buildConfiguration
+  value: Release
 
 stages:
-# Build for both push & PR
+# -------- Build for push & PR --------
 - stage: Build
   displayName: Build iot-gateway (Dev)
   jobs:
-  - template: ../templates/build-dotnet.yml
+  - template: pipelines/templates/build-dotnet.yml   # <- path from repo root
     parameters:
       solution: $(solution)
       project: $(project)
-      configuration: Release
+      configuration: $(buildConfiguration)
 
-# Docker & Deploy only on direct dev pushes (skip PRs)
+# -------- Release (skip on PRs) --------
 - stage: Release
-  displayName: Release to Dev
+  displayName: Docker → ACR → ACA (Dev)
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
-  - template: ../templates/docker-buildpush.yml
+  - template: pipelines/templates/docker-buildpush.yml
     parameters:
-      containerRegistryServiceConnection: acr-dev
+      containerRegistryServiceConnection: acrServiceConnection
       repository: $(imageName)
       dockerfilePath: $(dockerfilePath)
-      contextFromPublish: true
+      buildContext: '$(Pipeline.Workspace)/publish/app'
 
-  - template: ../templates/deploy-aca.yml
-    parameters:
-      # uses var names from the variable group
-      azureSubscriptionVar: azureSubscription
-      acrLoginServerVar: acrLoginServer
-      resourceGroupVar: resourceGroup
-      containerAppVar: containerApp
+  - job: deploy_aca
+    displayName: Deploy to ACA (Dev)
+    dependsOn: docker_build_push
+    pool: { vmImage: 'ubuntu-latest' }
+    steps:
+    - task: AzureCLI@2
+      displayName: Update ACA revision
+      inputs:
+        azureSubscription: '$(azureSubscription)'   # from variable groups
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -euo pipefail
+          IMAGE="$(acrLoginServer)/$(imageName):$(Build.SourceBranchName)-$(Build.BuildId)"
+          az containerapp update \
+            --name "$(containerApp)" \
+            --resource-group "$(resourceGroup)" \
+            --image "$IMAGE" \
+            --set-env-vars \
+              DOTNET_ENVIRONMENT=Development \
+              SERVICEBUS__CONNECTION_STRING="$(SB_CONNECTION_STRING)" \
+              SERVICEBUS__QUEUENAME="$(QUEUE_NAME)"
