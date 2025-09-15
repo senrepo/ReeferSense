@@ -1,0 +1,62 @@
+# Trigger only when this project or its infra files change
+trigger:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - iot-gateway/**
+      - Dockerfile.iogw
+      - pipelines/iot-gateway/**
+      - pipelines/templates/**
+
+pr:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - iot-gateway/**
+      - Dockerfile.iogw
+      - pipelines/iot-gateway/**
+      - pipelines/templates/**
+
+# Pull this project's dev config
+variables:
+- group: iot-gateway-dev-config
+- name: imageName
+  value: iot-gateway
+- name: solution
+  value: ReeferSense.sln
+- name: project
+  value: iot-gateway/iot-gateway.csproj
+- name: dockerfilePath
+  value: Dockerfile.iogw
+
+stages:
+# Build for both push & PR
+- stage: Build
+  displayName: Build iot-gateway (Dev)
+  jobs:
+  - template: ../templates/build-dotnet.yml
+    parameters:
+      solution: $(solution)
+      project: $(project)
+      configuration: Release
+
+# Docker & Deploy only on direct dev pushes (skip PRs)
+- stage: Release
+  displayName: Release to Dev
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - template: ../templates/docker-buildpush.yml
+    parameters:
+      containerRegistryServiceConnection: acr-dev
+      repository: $(imageName)
+      dockerfilePath: $(dockerfilePath)
+      contextFromPublish: true
+
+  - template: ../templates/deploy-aca.yml
+    parameters:
+      # uses var names from the variable group
+      azureSubscriptionVar: azureSubscription
+      acrLoginServerVar: acrLoginServer
+      resourceGroupVar: resourceGroup
+      containerAppVar: containerApp

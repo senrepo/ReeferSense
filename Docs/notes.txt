@@ -20,7 +20,11 @@ Running Angular in Docker
     https://dextrop.medium.com/containerizing-a-angular-application-using-docker-a71968269821
     https://dev.to/rodrigokamada/creating-and-running-an-angular-application-in-a-docker-container-40mk
 
+Azure container Instance Creation 
+    https://learn.microsoft.com/en-us/training/modules/deploy-manage-container-app-using-azure-container-apps/2-prepare-deployment-tools-resources
 
 AZure SQL Server
     servername: reefer-sense.database.windows.net
     reefersenseadmin, pwd- ReeferSense@2025
+
+

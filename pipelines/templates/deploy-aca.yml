@@ -1,0 +1,38 @@
+parameters:
+  azureSubscriptionVar: 'azureSubscription'  # var name from variable group
+  acrLoginServerVar: 'acrLoginServer'
+  resourceGroupVar: 'resourceGroup'
+  containerAppVar: 'containerApp'
+  extraEnv: []   # list of "KEY=$(VALUE)" pairs if needed
+
+jobs:
+- job: deploy_aca
+  displayName: Deploy to Azure Container Apps
+  pool: { vmImage: 'ubuntu-latest' }
+  steps:
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: '$(\${{ parameters.azureSubscriptionVar }})'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        IMAGE="$(\${{ parameters.acrLoginServerVar }})/$(imageName):$(Build.SourceBranchName)-$(Build.BuildId)"
+        echo "Using image: $IMAGE"
+
+        # Compose env var arguments
+        ENV_ARGS=( \
+          --set-env-vars DOTNET_ENVIRONMENT=Development \
+          --set-env-vars SERVICEBUS__CONNECTION_STRING="$(SB_CONNECTION_STRING)" \
+          --set-env-vars SERVICEBUS__QUEUENAME="$(QUEUE_NAME)" \
+        )
+        # If extraEnv provided, append
+        ${#parameters.extraEnv[@]} >/dev/null 2>&1 && for kv in ${parameters.extraEnv[@]}; do
+          ENV_ARGS+=( --set-env-vars "$kv" )
+        done
+
+        az containerapp update \
+          --name "$( \${{ parameters.containerAppVar }})" \
+          --resource-group "$( \${{ parameters.resourceGroupVar }})" \
+          --image "$IMAGE" \
+          "${ENV_ARGS[@]}"
