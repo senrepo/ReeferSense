@@ -5,8 +5,6 @@ parameters:
 jobs:
 - job: build
   displayName: Build .NET (project-only)
-  pool:
-    vmImage: 'ubuntu-latest'
   steps:
   - task: UseDotNet@2
     inputs:
