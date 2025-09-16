@@ -5,22 +5,22 @@ parameters:
 jobs:
 - job: build
   displayName: Build .NET (project-only)
-  pool: { vmImage: 'ubuntu-latest' }
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
       version: '8.0.x'
 
-  # NuGet cache keyed off project & common package-management files (not .sln)
+  # Cache the default NuGet package folder on linux agents
   - task: Cache@2
     displayName: Cache NuGet
     inputs:
-      key: |
-        nuget | $(Agent.OS) |
-        **/Directory.Packages.props,**/packages.lock.json,**/global.json,**/*.csproj,**/*.props,**/*.targets
-      path: $(NUGET_PACKAGES)
-      restoreKeys: nuget | $(Agent.OS)
+      key: 'nuget | "$(Agent.OS)" | **/Directory.Packages.props | **/*.csproj | **/*.props | **/*.targets | **/global.json'
+      restoreKeys: |
+        nuget | "$(Agent.OS)"
+      path: $(HOME)/.nuget/packages
 
   # Restore ONLY the project (not the whole solution)
   - script: dotnet restore "${{ parameters.project }}"
