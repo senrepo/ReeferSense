@@ -54,7 +54,7 @@ stages:
       containerRegistryServiceConnection: $(acrServiceConnection)  # from env-dev
       repository: $(imageName)
       dockerfilePath: $(Build.SourcesDirectory)/$(dockerfilePath)
-      buildContext: '$(Pipeline.Workspace)/publish/app'
+      buildContext: '$(Build.SourcesDirectory)'
 
   - job: deploy_aca
     displayName: Deploy to ACA (Dev)
