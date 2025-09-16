@@ -4,32 +4,30 @@ trigger:
   branches: { include: [ dev ] }
   paths:
     include:
-      - iot-gateway/**
-      - Dockerfile.iogw
-      - pipelines/iot-gateway/**
-      - pipelines/templates/**
+      - iot-gateway/**                 # project files
+      - iot-gateway/Dockerfile         # Dockerfile path (match reality)
+      - pipelines/iot-gateway/**       # this pipeline file(s)
+      - pipelines/templates/**         # shared templates
 
 pr:
   branches: { include: [ dev ] }
   paths:
     include:
       - iot-gateway/**
-      - Dockerfile
+      - iot-gateway/Dockerfile         # match trigger path
       - pipelines/iot-gateway/**
       - pipelines/templates/**
 
-# Load env-level first, then project-level (project overrides env on key collisions)
+# Load env-level first, then project-level (project overrides if key collision)
 variables:
 - group: env-dev
 - group: iot-gateway-dev
 
 # Repo-specific values
-- name: solution
-  value: ReeferSense.sln
 - name: project
   value: iot-gateway/iot-gateway.csproj
 - name: dockerfilePath
-  value: Dockerfile
+  value: iot-gateway/Dockerfile
 - name: imageName
   value: iot-gateway
 - name: buildConfiguration
@@ -40,7 +38,7 @@ stages:
 - stage: Build
   displayName: Build iot-gateway (Dev)
   jobs:
-  - template: ../templates/build-dotnet.yml   # <- path from repo root
+  - template: ../templates/build-dotnet.yml
     parameters:
       project: $(project)
       configuration: $(buildConfiguration)
@@ -53,20 +51,21 @@ stages:
   jobs:
   - template: ../templates/docker-buildpush.yml
     parameters:
-      containerRegistryServiceConnection: $(acrServiceConnection)
+      containerRegistryServiceConnection: $(acrServiceConnection)  # from env-dev
       repository: $(imageName)
-      dockerfilePath: $(dockerfilePath)
+      dockerfilePath: $(Build.SourcesDirectory)/$(dockerfilePath)
       buildContext: '$(Pipeline.Workspace)/publish/app'
 
   - job: deploy_aca
     displayName: Deploy to ACA (Dev)
     dependsOn: docker_build_push
-    pool: { vmImage: 'ubuntu-latest' }
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
     - task: AzureCLI@2
       displayName: Update ACA revision
       inputs:
-        azureSubscription: '$(azureSubscription)'   # from variable groups
+        azureSubscription: '$(azureSubscription)'   # from env-dev
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
