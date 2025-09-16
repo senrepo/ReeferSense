@@ -29,7 +29,7 @@ variables:
 - name: project
   value: iot-gateway/iot-gateway.csproj
 - name: dockerfilePath
-  value: Dockerfile.iogw
+  value: Dockerfile
 - name: imageName
   value: iot-gateway
 - name: buildConfiguration
@@ -42,7 +42,6 @@ stages:
   jobs:
   - template: ../templates/build-dotnet.yml   # <- path from repo root
     parameters:
-      solution: $(solution)
       project: $(project)
       configuration: $(buildConfiguration)
 
