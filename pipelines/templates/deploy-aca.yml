@@ -1,4 +1,5 @@
 parameters:
+  dependsOn: []
   acrLoginServer: ''
   resourceGroup: ''
   containerApp: ''
@@ -6,6 +7,7 @@ parameters:
 
 jobs:
 - job: deploy_aca
+  dependsOn: ${{ parameters.dependsOn }}
   displayName: Create or Update Container App
   steps:
   - task: AzureCLI@2
