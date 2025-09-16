@@ -17,7 +17,8 @@ jobs:
   - task: Cache@2
     displayName: Cache NuGet
     inputs:
-      key: 'nuget | "$(Agent.OS)" | **/Directory.Packages.props | **/*.csproj | **/*.props | **/*.targets | **/global.json'
+      # Use the project file as the fingerprint (exists for sure)
+      key: 'nuget | "$(Agent.OS)" | ${{ parameters.project }}'
       restoreKeys: |
         nuget | "$(Agent.OS)"
       path: $(HOME)/.nuget/packages
