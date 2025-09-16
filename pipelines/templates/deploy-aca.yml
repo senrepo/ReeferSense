@@ -1,3 +1,4 @@
+# /pipelines/templates/deploy-aca.yml
 parameters:
   dependsOn: []          # e.g., docker_build_push
   acrLoginServer: ''
@@ -7,8 +8,7 @@ parameters:
 
 jobs:
 - job: deploy_aca
-  ${{ if ne(parameters.dependsOn, []) }}:
-    dependsOn: ${{ parameters.dependsOn }}
+  dependsOn: ${{ parameters.dependsOn }}
   displayName: Create or Update Container App
   steps:
   - task: AzureCLI@2
