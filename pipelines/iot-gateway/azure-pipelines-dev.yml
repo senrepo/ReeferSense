@@ -1,4 +1,4 @@
-﻿# /pipelines/iot-gateway/azure-pipelines-dev.yml
+# /pipelines/iot-gateway/azure-pipelines-dev.yml
 
 trigger:
   branches: { include: [ dev ] }
@@ -54,7 +54,7 @@ stages:
   jobs:
   - template: ../templates/docker-buildpush.yml
     parameters:
-      containerRegistryServiceConnection: acrServiceConnection
+      containerRegistryServiceConnection: $(acrServiceConnection)
       repository: $(imageName)
       dockerfilePath: $(dockerfilePath)
       buildContext: '$(Pipeline.Workspace)/publish/app'
