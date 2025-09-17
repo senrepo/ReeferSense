@@ -65,7 +65,7 @@ stages:
   - template: ../templates/deploy-aca.yml
     parameters:
       dependsOn: docker_build_push            # must match the job name in docker template
-      acrLoginServerVar:   $(acrLoginServer)
-      resourceGroupVar:    $(resourceGroup)
-      containerAppVar:     $(containerApp)
-      acaEnvironmentVar:   $(acaEnvironment)
+      acrLoginServer:   $(acrLoginServer)
+      resourceGroup:    $(resourceGroup)
+      containerApp:     $(containerApp)
+      acaEnvironment:   $(acaEnvironment)
