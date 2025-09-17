@@ -39,12 +39,17 @@ jobs:
           # CREATE: use --env-vars
           az containerapp create --name "${APP}" --resource-group "${RG}" --environment "${ENV_NAME}" \
             --image "${IMAGE}" --registry-server "${ACR_LOGIN}" --registry-username "${ACR_USER}" --registry-password "${ACR_PASS}" \
+            --ingress external --transport tcp --target-port 9000 --exposed-port 9000 \
             --env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" AppSettings__ServiceBus__ConnectionString="${SB_CONNECTION_STRING}" AppSettings__ServiceBus__QueueName="${QUEUE_NAME}"
         else
           echo "Updating Container App ${APP}..."
           # UPDATE: keep --set-env-vars
           az containerapp update --name "${APP}" --resource-group "${RG}" --image "${IMAGE}" \
             --set-env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" AppSettings__ServiceBus__ConnectionString="${SB_CONNECTION_STRING}" AppSettings__ServiceBus__QueueName="${QUEUE_NAME}"
+
+          # Ensure ingress is external TCP on 9000 -> 9000 (idempotent)
+          az containerapp ingress update -n "${APP}" -g "${RG}" \
+            --type external --transport tcp --target-port 9000 --exposed-port 9000
         fi
     env:
       DOTNET_ENVIRONMENT: Development
