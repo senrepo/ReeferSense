@@ -36,14 +36,15 @@ jobs:
           ACR_USER="$(az acr credential show -n "${ACR_NAME}" --query username -o tsv)"
           ACR_PASS="$(az acr credential show -n "${ACR_NAME}" --query passwords[0].value -o tsv)"
 
+          # CREATE: use --env-vars
           az containerapp create --name "${APP}" --resource-group "${RG}" --environment "${ENV_NAME}" \
-            --image "${IMAGE}" --registry-server "${ACR_LOGIN}" \
-            --registry-username "${ACR_USER}" --registry-password "${ACR_PASS}" \
-            --set-env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" SERVICEBUS__CONNECTION_STRING="${SB_CONNECTION_STRING}" SERVICEBUS__QUEUENAME="${QUEUE_NAME}"
+            --image "${IMAGE}" --registry-server "${ACR_LOGIN}" --registry-username "${ACR_USER}" --registry-password "${ACR_PASS}" \
+            --env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" AppSettings__ServiceBus__ConnectionString="${SB_CONNECTION_STRING}" AppSettings__ServiceBus__QueueName="${QUEUE_NAME}"
         else
           echo "Updating Container App ${APP}..."
+          # UPDATE: keep --set-env-vars
           az containerapp update --name "${APP}" --resource-group "${RG}" --image "${IMAGE}" \
-            --set-env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" SERVICEBUS__CONNECTION_STRING="${SB_CONNECTION_STRING}" SERVICEBUS__QUEUENAME="${QUEUE_NAME}"
+            --set-env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" AppSettings__ServiceBus__ConnectionString="${SB_CONNECTION_STRING}" AppSettings__ServiceBus__QueueName="${QUEUE_NAME}"
         fi
     env:
       DOTNET_ENVIRONMENT: Development
