@@ -28,3 +28,5 @@ AZure SQL Server
     reefersenseadmin, pwd- ReeferSense@2025
 
 
+TEST TCP Connection
+     Test-NetConnection iot-gateway-dev.wittywave-8117602b.centralus.azurecontainerapps.io -Port 9000
