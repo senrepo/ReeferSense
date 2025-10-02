@@ -50,14 +50,21 @@ stages:
 
     - powershell: |
         $root   = Split-Path "$(project)"
-        $search = Join-Path "$(Build.SourcesDirectory)" $root
-        $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter "*.dacpac" |
-                  Where-Object { $_.Name -eq "$(dacpacFileName)"  } |
-                  Sort-Object LastWriteTimeUtc -Descending |
-                  Select-Object -First 1
-        if (-not $dacpac) { throw "DACPAC not found at $dacpac" }
-        Write-Host "DACPAC full path: $dacpac"
-        Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$dacpac"
+            $search = Join-Path "$(Build.SourcesDirectory)" $root
+            $file   = "$(dacpacFileName)"   # e.g., reefer-sense-db.dacpac
+
+            $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $file -ErrorAction SilentlyContinue |
+                      Sort-Object LastWriteTimeUtc -Descending |
+                      Select-Object -First 1
+
+            if (-not $dacpac) {
+              Write-Host "Searched: $search (looking for: $file)"
+              throw "DACPAC not found"
+            }
+
+            # IMPORTANT: set the FULL PATH, not just the name
+            Write-Host "DACPAC full path: $($dacpac.FullName)"
+            Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$($dacpac.FullName)"
       name: outvars
       displayName: 'Locate DACPAC'
 
