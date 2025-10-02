@@ -1,4 +1,4 @@
-﻿pool:
+pool:
   vmImage: windows-latest     # sqlproj requires Windows image with VS
 
 trigger:
