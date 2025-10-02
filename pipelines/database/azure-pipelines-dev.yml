@@ -19,15 +19,21 @@ pr:
 
 variables:
 - group: env-dev              
-- group: database-dev
+- group: database-dev 
 
 # Repo-specific values
 - name: project
-  value: reefer-sense-db/reefer-sense-db.sqlproj         
+  value: reefer-sense-db/reefer-sense-db.sqlproj
 - name: dacpacFileName
-  value: reefer-sense-db.dacpac                           
+  value: reefer-sense-db.dacpac
 - name: buildConfiguration
   value: Release
+
+# ACR settings project-specific
+- name: acrRepository
+  value: dacpacs         
+- name: acrTag
+  value: $(Build.SourceBranchName)-$(Build.BuildId)
 
 stages:
 # -------- Build for push & PR --------
@@ -36,12 +42,11 @@ stages:
   jobs:
   - job: build_dacpac
     displayName: Build DACPAC (VSBuild)
-
     steps:
     - checkout: self
 
     - task: VSBuild@1
-      displayName: 'Build SQL Project'
+      displayName: Build SQL Project
       inputs:
         solution: '$(project)'
         msbuildArgs: '/p:Configuration=$(buildConfiguration)'
@@ -50,27 +55,75 @@ stages:
 
     - powershell: |
         $root   = Split-Path "$(project)"
-            $search = Join-Path "$(Build.SourcesDirectory)" $root
-            $file   = "$(dacpacFileName)"   # e.g., reefer-sense-db.dacpac
+        $search = Join-Path "$(Build.SourcesDirectory)" $root
+        $file   = "$(dacpacFileName)"   # e.g., reefer-sense-db.dacpac
 
-            $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $file -ErrorAction SilentlyContinue |
-                      Sort-Object LastWriteTimeUtc -Descending |
-                      Select-Object -First 1
+        $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $file -ErrorAction SilentlyContinue |
+                  Sort-Object LastWriteTimeUtc -Descending |
+                  Select-Object -First 1
 
-            if (-not $dacpac) {
-              Write-Host "Searched: $search (looking for: $file)"
-              throw "DACPAC not found"
-            }
+        if (-not $dacpac) {
+          Write-Host "Searched: $search (looking for: $file)"
+          throw "DACPAC not found"
+        }
 
-            # IMPORTANT: set the FULL PATH, not just the name
-            Write-Host "DACPAC full path: $($dacpac.FullName)"
-            Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$($dacpac.FullName)"
+        # IMPORTANT: set the FULL PATH, not just the name
+        Write-Host "DACPAC full path: $($dacpac.FullName)"
+        Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$($dacpac.FullName)"
       name: outvars
-      displayName: 'Locate DACPAC'
+      displayName: Locate DACPAC
 
     - task: PublishPipelineArtifact@1
-      displayName: 'Publish DACPAC (pipeline artifact)'
+      displayName: Publish DACPAC (pipeline artifact)
       inputs:
         targetPath: '$(outvars.DacpacPath)'
         artifact: 'dacpac'
         publishLocation: 'pipeline'
+
+# -------- Release (skip on PRs) --------
+- stage: Release
+  displayName: Push DACPAC to ACR (Dev)
+  dependsOn: Build
+  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+- job: acr_push
+  displayName: oras push → ACR (sha + latest)
+  steps:
+  - download: current
+    artifact: dacpac
+
+  - task: AzureCLI@2
+    displayName: Azure login (ARM svc conn)
+    inputs:
+      azureSubscription: '$(azureSubscription)' 
+      scriptType: ps
+      scriptLocation: inlineScript
+      inlineScript: |
+        az account show -o table
+
+  - powershell: |
+      Write-Host "Installing ORAS CLI..."
+      Invoke-WebRequest -Uri "https://oras.land/install.ps1" -UseBasicParsing | Invoke-Expression
+      oras version
+
+      # Path to the downloaded DACPAC artifact
+      $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
+      if (-not (Test-Path $dacpac)) {
+        throw "DACPAC not found at $dacpac"
+      }
+
+      Write-Host "Login to ACR: $(acrLoginServer)"
+      az acr login --name "$(acrLoginServer)"
+
+      $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
+      $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
+
+      Write-Host "Pushing $dacpac to $refSha"
+      oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+
+      Write-Host "Tagging latest: $refLatest"
+      oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+
+      Write-Host "Done: $refSha and $refLatest"
+    displayName: Push DACPAC (sha + latest)
+
