@@ -54,7 +54,7 @@ stages:
         $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $dacpacFileName -ErrorAction SilentlyContinue |
             Sort-Object LastWriteTimeUtc -Descending |
             Select-Object -First 1
-        if (-not $dacpac) { { throw "DACPAC not found at $dacpac" }
+        if (-not $dacpac) { throw "DACPAC not found at $dacpac" }
         Write-Host "DACPAC full path: $dacpac"
         Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$dacpac"
       name: outvars
