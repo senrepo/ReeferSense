@@ -1,0 +1,67 @@
+﻿pool:
+  vmImage: windows-latest     # sqlproj requires Windows image with VS
+
+trigger:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - reefer-sense-db/**
+      - pipelines/database/**
+      - pipelines/templates/**
+
+pr:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - reefer-sense-db/**
+      - pipelines/database/**
+      - pipelines/templates/**
+
+variables:
+- group: env-dev              
+- group: database-dev
+
+# Repo-specific values
+- name: project
+  value: reefer-sense-db/reefer-sense-db.sqlproj         
+- name: dacpacName
+  value: reefer-sense-db.dacpac                           
+- name: buildConfiguration
+  value: Release
+
+stages:
+# -------- Build for push & PR --------
+- stage: Build
+  displayName: Build database (.sqlproj → .dacpac)
+  jobs:
+  - job: build_dacpac
+    displayName: Build DACPAC (VSBuild)
+
+    steps:
+    - checkout: self
+
+    - task: VSBuild@1
+      displayName: 'Build SQL Project'
+      inputs:
+        solution: '$(project)'
+        msbuildArgs: '/p:Configuration=$(buildConfiguration)'
+        platform: 'Any CPU'
+        configuration: '$(buildConfiguration)'
+
+    - powershell: |
+        $root   = Split-Path "$(project)"
+        $search = Join-Path "$(Build.SourcesDirectory)" $root
+        $dacpac = Get-ChildItem -Path $search -Recurse -Filter $dacpacName |
+                  Sort-Object LastWriteTime -Descending |
+                  Select-Object -First 1
+        if (-not $dacpac) { throw "DACPAC not found under $search (looking for $dacpacName)" }
+        Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$($dacpac.FullName)"
+      name: outvars
+      displayName: 'Locate DACPAC'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish DACPAC (pipeline artifact)'
+      inputs:
+        targetPath: '$(outvars.DacpacPath)'
+        artifact: 'dacpac'
+        publishLocation: 'pipeline'

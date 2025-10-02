@@ -40,6 +40,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{9304B687-1B99-41A1-BCD5-F580FF643DEA}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\database\azure-pipelines-dev.yml = pipelines\database\azure-pipelines-dev.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +84,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FEE3D20C-12B3-44AD-B2A7-4938F35A4E8B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AB753C13-27B5-4E24-A08E-2661EBDC29A4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9304B687-1B99-41A1-BCD5-F580FF643DEA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8513E262-E852-481D-A641-195F4102C67A}
