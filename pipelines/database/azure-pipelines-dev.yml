@@ -24,7 +24,7 @@ variables:
 # Repo-specific values
 - name: project
   value: reefer-sense-db/reefer-sense-db.sqlproj         
-- name: dacpacName
+- name: dacpacFileName
   value: reefer-sense-db.dacpac                           
 - name: buildConfiguration
   value: Release
@@ -50,7 +50,7 @@ stages:
 
     - powershell: |
         $root   = Split-Path "$(project)"
-        $dacpac = Join-Path "$(Build.SourcesDirectory)" "$root\bin\$(buildConfiguration)\$(dacpacName).dacpac"
+        $dacpac = Join-Path "$(Build.SourcesDirectory)" "$root\bin\$(buildConfiguration)\$(dacpacFileName)"
         if (!(Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
         Write-Host "DACPAC full path: $dacpac"
         Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$dacpac"
