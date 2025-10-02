@@ -51,9 +51,10 @@ stages:
     - powershell: |
         $root   = Split-Path "$(project)"
         $search = Join-Path "$(Build.SourcesDirectory)" $root
-        $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $dacpacFileName -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTimeUtc -Descending |
-            Select-Object -First 1
+        $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter "*.dacpac" |
+                  Where-Object { $_.Name -eq "$(dacpacFileName)"  } |
+                  Sort-Object LastWriteTimeUtc -Descending |
+                  Select-Object -First 1
         if (-not $dacpac) { throw "DACPAC not found at $dacpac" }
         Write-Host "DACPAC full path: $dacpac"
         Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$dacpac"
