@@ -50,13 +50,11 @@ stages:
 
     - powershell: |
         $root   = Split-Path "$(project)"
-        $search = Join-Path "$(Build.SourcesDirectory)" $root
-        $dacpac = Get-ChildItem -Path $search -Recurse -Filter $dacpacName |
-                  Sort-Object LastWriteTime -Descending |
-                  Select-Object -First 1
-        if (-not $dacpac) { throw "DACPAC not found under $search (looking for $dacpacName)" }
-        Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$($dacpac.FullName)"
-      name: outvars
+        $dacpac = Join-Path "$(Build.SourcesDirectory)" "$root\bin\$(buildConfiguration)\$(dacpacName).dacpac"
+        if (!(Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
+        Write-Host "DACPAC full path: $dacpac"
+        Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$dacpac"
+          name: outvars
       displayName: 'Locate DACPAC'
 
     - task: PublishPipelineArtifact@1
