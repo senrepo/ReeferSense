@@ -18,8 +18,8 @@ pr:
       - pipelines/templates/**
 
 variables:
-- group: env-dev              
-- group: database-dev 
+- group: env-dev 
+- group: database-dev
 
 # Repo-specific values
 - name: project
@@ -31,7 +31,7 @@ variables:
 
 # ACR settings project-specific
 - name: acrRepository
-  value: dacpacs         
+  value: dacpacs
 - name: acrTag
   value: $(Build.SourceBranchName)-$(Build.BuildId)
 
@@ -56,7 +56,7 @@ stages:
     - powershell: |
         $root   = Split-Path "$(project)"
         $search = Join-Path "$(Build.SourcesDirectory)" $root
-        $file   = "$(dacpacFileName)"   # e.g., reefer-sense-db.dacpac
+        $file   = "$(dacpacFileName)" 
 
         $dacpac = Get-ChildItem -Path $search -Recurse -File -Filter $file -ErrorAction SilentlyContinue |
                   Sort-Object LastWriteTimeUtc -Descending |
@@ -84,46 +84,45 @@ stages:
 - stage: Release
   displayName: Push DACPAC to ACR (Dev)
   dependsOn: Build
-  condition:  and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
+  condition: and( succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest') )
   jobs:
-- job: acr_push
-  displayName: oras push → ACR (sha + latest)
-  steps:
-  - download: current
-    artifact: dacpac
+  - job: acr_push
+    displayName: oras push → ACR (sha + latest)
+    steps:
+    - download: current
+      artifact: dacpac
 
-  - task: AzureCLI@2
-    displayName: Azure login (ARM svc conn)
-    inputs:
-      azureSubscription: '$(azureSubscription)' 
-      scriptType: ps
-      scriptLocation: inlineScript
-      inlineScript: |
-        az account show -o table
+    - task: AzureCLI@2
+      displayName: Azure login (ARM svc conn)
+      inputs:
+        azureSubscription: '$(azureSubscription)'  
+        scriptType: ps
+        scriptLocation: inlineScript
+        inlineScript: |
+          az account show -o table
 
-  - powershell: |
-      Write-Host "Installing ORAS CLI..."
-      Invoke-WebRequest -Uri "https://oras.land/install.ps1" -UseBasicParsing | Invoke-Expression
-      oras version
+    - powershell: |
+        Write-Host "Installing ORAS CLI..."
+        Invoke-WebRequest -Uri "https://oras.land/install.ps1" -UseBasicParsing | Invoke-Expression
+        oras version
 
-      # Path to the downloaded DACPAC artifact
-      $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
-      if (-not (Test-Path $dacpac)) {
-        throw "DACPAC not found at $dacpac"
-      }
+        # Path to the downloaded DACPAC artifact
+        $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
+        if (-not (Test-Path $dacpac)) {
+          throw "DACPAC not found at $dacpac"
+        }
 
-      Write-Host "Login to ACR: $(acrLoginServer)"
-      az acr login --name "$(acrLoginServer)"
+        Write-Host "Login to ACR: $(acrLoginServer)"
+        az acr login --name "$(acrLoginServer)"  
 
-      $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
-      $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
+        $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
+        $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
 
-      Write-Host "Pushing $dacpac to $refSha"
-      oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+        Write-Host "Pushing $dacpac to $refSha"
+        oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
 
-      Write-Host "Tagging latest: $refLatest"
-      oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+        Write-Host "Tagging latest: $refLatest"
+        oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
 
-      Write-Host "Done: $refSha and $refLatest"
-    displayName: Push DACPAC (sha + latest)
-
+        Write-Host "Done: $refSha and $refLatest"
+      displayName: Push DACPAC (sha + latest)
