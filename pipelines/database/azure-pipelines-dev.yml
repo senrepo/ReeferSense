@@ -146,9 +146,20 @@ stages:
         $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
 
-        Write-Host "Pushing to $refSha"
-        oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+        $dir  = Split-Path $dacpac -Parent
+        $file = Split-Path $dacpac -Leaf
 
-        Write-Host "Tagging latest → $refLatest"
-        oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+        Push-Location $dir
+        try {
+            Write-Host "Pushing (SHA): $refSha"
+            oras push $refSha --artifact-type application/vnd.microsoft.dacpac `
+            "$file:application/vnd.microsoft.dacpac"
+
+            Write-Host "Pushing (latest): $refLatest"
+            oras push $refLatest --artifact-type application/vnd.microsoft.dacpac `
+            "$file:application/vnd.microsoft.dacpac"
+        }
+        finally { Pop-Location }
+
+        Write-Host "Done: $refSha and $refLatest"
       displayName: Push DACPAC to ACR
