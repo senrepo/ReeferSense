@@ -34,8 +34,6 @@ variables:
   value: dacpacs
 - name: acrTag
   value: $(Build.SourceBranchName)-$(Build.BuildId)
-- name: ORAS_VERSION
-  value: 1.3.0
 
 stages:
 # -------- Build for push & PR --------
@@ -95,7 +93,7 @@ stages:
       artifact: dacpac
 
     - task: AzureCLI@2
-      displayName: Azure login (ARM svc conn)
+      displayName: Azure login
       inputs:
         azureSubscription: '$(azureSubscription)'  
         scriptType: ps
@@ -105,53 +103,52 @@ stages:
 
     - powershell: |
         $ErrorActionPreference = 'Stop'
-        $ver = '$(ORAS_VERSION)'
-        $zip = "$env:AGENT_TEMPDIRECTORY\oras_$ver.zip"
+        $ver = '1.3.0'
+        $tmp = $env:AGENT_TEMPDIRECTORY
+        $zip = Join-Path $tmp "oras_$ver.zip"
         $url = "https://github.com/oras-project/oras/releases/download/v$ver/oras_${ver}_windows_amd64.zip"
-        $extract = "$env:AGENT_TEMPDIRECTORY\oras_$ver"
+        $extract = Join-Path $tmp "oras_$ver"
+        $bindir = Join-Path $tmp "oras-bin"
 
         Write-Host "Downloading ORAS $ver from $url"
         Invoke-WebRequest -Uri $url -OutFile $zip
 
         Write-Host "Extracting to $extract"
+        if (Test-Path $extract) { Remove-Item -Recurse -Force $extract }
         Expand-Archive -Path $zip -DestinationPath $extract -Force
 
-        # Put oras.exe into agent temp and prepend PATH for subsequent tasks
-        Copy-Item -Path (Join-Path $extract 'oras.exe') -Destination $env:AGENT_TEMPDIRECTORY -Force
+        # Locate oras.exe regardless of subfolder layout
+        $orasExe = Get-ChildItem -Path $extract -Recurse -File -Filter 'oras.exe' |
+                   Select-Object -First 1
+        if (-not $orasExe) {
+          throw "oras.exe not found under $extract"
+        }
 
-        # Make it available to later tasks in this job
-        Write-Host "##vso[task.prependpath]$env:AGENT_TEMPDIRECTORY"
+        # Put oras.exe into a stable bin folder and add to PATH for THIS task
+        if (!(Test-Path $bindir)) { New-Item -ItemType Directory -Path $bindir | Out-Null }
+        Copy-Item -Path $orasExe.FullName -Destination (Join-Path $bindir 'oras.exe') -Force
+        $env:PATH = "$bindir;$env:PATH"
 
-        # Verify
-        oras version
-        
-      displayName: 'Install ORAS (PowerShell)' 
+        # Also prepend for subsequent tasks
+        Write-Host "##vso[task.prependpath]$bindir"
+
+        & (Join-Path $bindir 'oras.exe') version
+      displayName: Install ORAS (PowerShell)
 
     - powershell: |
         $ErrorActionPreference = 'Stop'
 
-        # Locate the DACPAC previously published & downloaded as a pipeline artifact
         $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
-        if (-not (Test-Path $dacpac)) {
-          throw "DACPAC not found at $dacpac"
-        }
-        Write-Host "DACPAC: $dacpac"
+        if (-not (Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
 
-        # Login to ACR (use ACR *name*, not login server)
-        az acr login --name "$(acrLoginServer)"
+        az acr login --name "$(acrLoginServer)"   # ACR *name*, not login server
 
-        # Build refs
         $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
-        Write-Host "Target refs: `n  SHA: $refSha`n  Latest: $refLatest"
 
-        # Push SHA tag
         Write-Host "Pushing to $refSha"
         oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
 
-        # Push 'latest' tag
         Write-Host "Tagging latest → $refLatest"
         oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
-
-        Write-Host "Done: $refSha and $refLatest"
       displayName: Push DACPAC to ACR
