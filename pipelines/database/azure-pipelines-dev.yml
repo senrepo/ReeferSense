@@ -102,27 +102,27 @@ stages:
           az account show -o table
 
     - powershell: |
-        Write-Host "Installing ORAS CLI..."
-        Invoke-WebRequest -Uri "https://oras.land/install.ps1" -UseBasicParsing | Invoke-Expression
-        oras version
+          $ErrorActionPreference = 'Stop'
+          $ver = '$(ORAS_VERSION)'
+          $zip = "$env:AGENT_TEMPDIRECTORY\oras_$ver_windows_amd64.zip"
+          $url = "https://github.com/oras-project/oras/releases/download/v$ver/oras_$ver_windows_amd64.zip"
+          Write-Host "Downloading ORAS $ver from $url"
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $env:AGENT_TEMPDIRECTORY -Force
+          $env:PATH = "$env:AGENT_TEMPDIRECTORY;$env:PATH"
+          oras version
 
-        # Path to the downloaded DACPAC artifact
-        $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
-        if (-not (Test-Path $dacpac)) {
-          throw "DACPAC not found at $dacpac"
-        }
+          $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
+          if (-not (Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
 
-        Write-Host "Login to ACR: $(acrLoginServer)"
-        az acr login --name "$(acrLoginServer)"  
+          az acr login --name "$(acrName)"
 
-        $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
-        $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
+          $refSha    = "$(acrLoginServer)/$(acrRepository):$(Build.SourceVersion)"
+          $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
 
-        Write-Host "Pushing $dacpac to $refSha"
-        oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+          Write-Host "Pushing $dacpac to $refSha"
+          oras push $refSha --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
 
-        Write-Host "Tagging latest: $refLatest"
-        oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
-
-        Write-Host "Done: $refSha and $refLatest"
-      displayName: Push DACPAC (sha + latest)
+          Write-Host "Tagging latest: $refLatest"
+          oras push $refLatest --artifact-type application/vnd.microsoft.dacpac "$dacpac:application/vnd.microsoft.dacpac"
+      displayName: Install ORAS & Push (Windows)
