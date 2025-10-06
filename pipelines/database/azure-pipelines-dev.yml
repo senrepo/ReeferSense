@@ -84,7 +84,7 @@ stages:
 - stage: Release
   displayName: Push DACPAC to ACR (Dev)
   dependsOn: Build
-  condition: and( succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest') )
+  condition: and ( succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest') )
   jobs:
   - job: acr_push
     displayName: ORAS → ACR (sha + latest) on Windows
@@ -94,88 +94,66 @@ stages:
     - download: current
       artifact: dacpac
 
-    - task: AzureCLI@2
-      displayName: Install ORAS + ACR token login + Push (Windows, single step)
-      inputs:
-        azureSubscription: '$(azureSubscription)'  # from env-dev variable group
-        scriptType: ps
-        scriptLocation: inlineScript
-        inlineScript: |
-          $ErrorActionPreference = 'Stop'
+    # Install ORAS and expose to PATH
+    - powershell: |
+        $ErrorActionPreference = 'Stop'
+        $ver      = '$(ORAS_VERSION)'
+        $tmp      = $env:AGENT_TEMPDIRECTORY
+        $zip      = Join-Path $tmp "oras_$ver.zip"
+        $url      = "https://github.com/oras-project/oras/releases/download/v$ver/oras_${ver}_windows_amd64.zip"
+        $extract  = Join-Path $tmp "oras_$ver"
+        $bindir   = Join-Path $tmp "oras-bin"
 
-          # --- Install ORAS ---
-          $ver   = '$(ORAS_VERSION)'
-          $tmp   = $env:AGENT_TEMPDIRECTORY
-          $zip   = Join-Path $tmp "oras_$ver.zip"
-          $url   = "https://github.com/oras-project/oras/releases/download/v$ver/oras_${ver}_windows_amd64.zip"
-          $out   = Join-Path $tmp "oras_$ver"
-          $bin   = Join-Path $tmp "oras-bin"
+        Write-Host "Downloading ORAS $ver from $url"
+        Invoke-WebRequest -Uri $url -OutFile $zip
 
-          Write-Host "Azure context:"; az account show -o table
+        if (Test-Path $extract) { Remove-Item -Recurse -Force $extract }
+        Expand-Archive -Path $zip -DestinationPath $extract -Force
 
-          Write-Host "Downloading ORAS $ver from $url"
-          Invoke-WebRequest -Uri $url -OutFile $zip
+        $orasExe = Get-ChildItem -Path $extract -Recurse -File -Filter 'oras.exe' | Select-Object -First 1
+        if (-not $orasExe) { throw "oras.exe not found under $extract" }
 
-          if (Test-Path $out) { Remove-Item -Recurse -Force $out }
-          Expand-Archive -Path $zip -DestinationPath $out -Force
+        if (!(Test-Path $bindir)) { New-Item -ItemType Directory -Path $bindir | Out-Null }
+        Copy-Item -Path $orasExe.FullName -Destination (Join-Path $bindir 'oras.exe') -Force
 
-          $orasExe = Get-ChildItem -Path $out -Recurse -File -Filter 'oras.exe' | Select-Object -First 1
-          if (-not $orasExe) { throw "oras.exe not found under $out" }
+        # Make ORAS available now and to subsequent tasks
+        $env:PATH = "$bindir;$env:PATH"
+        Write-Host "##vso[task.prependpath]$bindir"
 
-          if (!(Test-Path $bin)) { New-Item -ItemType Directory -Path $bin | Out-Null }
-          Copy-Item -Path $orasExe.FullName -Destination (Join-Path $bin 'oras.exe') -Force
-          $env:PATH = "$bin;$env:PATH"
-          Write-Host "##vso[task.prependpath]$bin"
+        & (Join-Path $bindir 'oras.exe') version
+      displayName: Install ORAS (Windows)
 
-          # Verify ORAS
-          & (Join-Path $bin 'oras.exe') version
+    # Login with ACR admin (or repo-scoped) creds and push DACPAC (SHA + latest)
+    - powershell: |
+        $ErrorActionPreference = 'Stop'
 
-          # --- Resolve DACPAC path ---
-          $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
-          if (-not (Test-Path $dacpac)) {
-            Write-Host "Contents of $(Pipeline.Workspace)\dacpac:"
-            Get-ChildItem -Path "$(Pipeline.Workspace)\dacpac" -Recurse | ForEach-Object { $_.FullName }
-            throw "DACPAC not found at $dacpac"
-          }
-          Write-Host "DACPAC: $dacpac"
+        # Resolve DACPAC path from downloaded artifact
+        $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
+        if (-not (Test-Path $dacpac)) {
+          Write-Host "Contents of $(Pipeline.Workspace)\dacpac:"
+          Get-ChildItem -Path "$(Pipeline.Workspace)\dacpac" -Recurse | ForEach-Object { $_.FullName }
+          throw "DACPAC not found at $dacpac"
+        }
 
-          # --- ACR token + ORAS login ---
-          Write-Host "Minting ACR access token for $(acrName)…"
-          $token = az acr login --name "$(acrName)" --expose-token --query accessToken -o tsv
-          if (-not $token) { throw "Failed to obtain ACR access token. Check service connection / acrName." }
+        # Ensure ACR credentials are present (from variable group)
+        if (-not "$(acrLoginServer)" -or -not "$(acrUsername)" -or -not "$(acrPassword)") {
+          throw "ACR credentials missing: ensure acrLoginServer, acrUsername, acrPassword are defined in your variable group."
+        }
 
-          # Use password-stdin to avoid echoing secrets; check exit code explicitly
-          $pinfo = New-Object System.Diagnostics.ProcessStartInfo
-          $pinfo.FileName = "oras"
-          $pinfo.Arguments = "login $(acrLoginServer) --username 00000000-0000-0000-0000-000000000000 --password-stdin"
-          $pinfo.RedirectStandardInput = $true
-          $pinfo.RedirectStandardOutput = $true
-          $pinfo.RedirectStandardError  = $true
-          $pinfo.UseShellExecute = $false
-          $proc = New-Object System.Diagnostics.Process
-          $proc.StartInfo = $pinfo
-          $null = $proc.Start()
-          $proc.StandardInput.Write($token)
-          $proc.StandardInput.Close()
-          $stdout = $proc.StandardOutput.ReadToEnd()
-          $stderr = $proc.StandardError.ReadToEnd()
-          $proc.WaitForExit()
-          Write-Host $stdout
-          if ($proc.ExitCode -ne 0) {
-            Write-Error $stderr
-            throw "oras login failed with exit code $($proc.ExitCode)"
-          }
+        # ORAS login using basic auth (reliable on Windows)
+        Write-Host "oras login to $(acrLoginServer) as $(acrUsername)"
+        oras login "$(acrLoginServer)" --username "$(acrUsername)" --password "$(acrPassword)"
 
-          # --- Build refs ---
-          $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
-          $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
-          Write-Host "Targets:`n  SHA: $refSha`n  Latest: $refLatest"
+        # Build target refs
+        $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
+        $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
+        Write-Host "Targets:`n  SHA: $refSha`n  Latest: $refLatest"
 
-          # --- Windows-safe push: cd to file dir and use only the filename in file:mediatype ---
-          $dir  = Split-Path $dacpac -Parent
-          $file = Split-Path $dacpac -Leaf
-          Set-Location $dir
-
+        # Windows-safe push: cd to file's directory and pass only the filename in file:mediaType
+        $dir  = Split-Path $dacpac -Parent
+        $file = Split-Path $dacpac -Leaf
+        Push-Location $dir
+        try {
           Write-Host "Pushing (SHA)…"
           oras push "$refSha" --artifact-type application/vnd.microsoft.dacpac "$file:application/vnd.microsoft.dacpac"
           if ($LASTEXITCODE -ne 0) { throw "oras push (SHA) failed with exit code $LASTEXITCODE" }
@@ -183,8 +161,14 @@ stages:
           Write-Host "Pushing (latest)…"
           oras push "$refLatest" --artifact-type application/vnd.microsoft.dacpac "$file:application/vnd.microsoft.dacpac"
           if ($LASTEXITCODE -ne 0) { throw "oras push (latest) failed with exit code $LASTEXITCODE" }
+        }
+        finally {
+          Pop-Location
+        }
 
-          Write-Host "Done: $refSha and $refLatest"
+        Write-Host "Done: $refSha and $refLatest"
+      displayName: Push DACPAC to ACR (basic auth, Windows-safe)
+
 
 
 
