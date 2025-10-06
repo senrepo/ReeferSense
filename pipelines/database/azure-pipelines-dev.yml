@@ -88,18 +88,17 @@ stages:
   jobs:
   - job: acr_push
     displayName: ORAS → ACR (sha + latest)
-    pool:
-      vmImage: windows-latest
     steps:
     - download: current
       artifact: dacpac
 
-    # Authenticate az CLI with your ARM service connection
+    # Authenticate with ARM and expose SP creds for later steps
     - task: AzureCLI@2
-      displayName: Azure login (ARM svc conn)
+      displayName: Azure login (expose SP creds)
       inputs:
-        azureSubscription: '$(azureSubscription)'
+        azureSubscription: '$(azureServiceConnection)'   # from env-dev group
         scriptType: ps
+        addSpnToEnvironment: true                        # <-- injects servicePrincipalId/Key/TenantId into env
         scriptLocation: inlineScript
         inlineScript: |
           az account show -o table
@@ -134,7 +133,7 @@ stages:
         & (Join-Path $bindir 'oras.exe') version
       displayName: Install ORAS (PowerShell)
 
-    # Push DACPAC to ACR using token auth; tag with SHA and latest (Windows-safe path handling)
+    # Push DACPAC to ACR using service connection SP creds; tag with SHA and latest
     - powershell: |
         $ErrorActionPreference = 'Stop'
 
@@ -142,15 +141,16 @@ stages:
         $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
         if (-not (Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
 
-        # Get ACR token (requires AzureCLI@2 step above)
-        Write-Host "Requesting ACR access token for: $(acrName)"
-        $token = az acr login --name "$(acrName)" --expose-token --output tsv --query accessToken
-        if (-not $token) { throw "Failed to obtain ACR access token. Check service connection / acrName." }
+        # Ensure SP creds are present from the AzureCLI@2 step
+        if (-not $env:servicePrincipalId -or -not $env:servicePrincipalKey) {
+          throw "Service principal credentials not found. Ensure AzureCLI@2 has addSpnToEnvironment: true and uses the correct service connection."
+        }
 
-        # Login ORAS to ACR with token (username is a dummy GUID per ACR docs)
-        oras login "$(acrLoginServer)" --username 00000000-0000-0000-0000-000000000000 --password $token
+        # Login ORAS to ACR using SP creds (requires ACR 'AcrPush' role or equivalent on the registry)
+        Write-Host "oras login $(acrLoginServer) with service principal"
+        oras login "$(acrLoginServer)" --username "$env:servicePrincipalId" --password "$env:servicePrincipalKey"
 
-        # Target refs
+        # Build refs
         $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
         Write-Host "Targets:`n  SHA: $refSha`n  Latest: $refLatest"
@@ -158,7 +158,6 @@ stages:
         # Work around Windows drive-letter colon by pushing from the file's directory
         $dir  = Split-Path $dacpac -Parent
         $file = Split-Path $dacpac -Leaf
-
         Push-Location $dir
         try {
           Write-Host "Pushing (SHA)…"
@@ -167,10 +166,9 @@ stages:
           Write-Host "Pushing (latest)…"
           oras push "$refLatest" --artifact-type application/vnd.microsoft.dacpac "$file:application/vnd.microsoft.dacpac"
         }
-        finally {
-          Pop-Location
-        }
+        finally { Pop-Location }
 
         Write-Host "Done: $refSha and $refLatest"
-      displayName: Push DACPAC to ACR
+      displayName: Push DACPAC to ACR (SP auth, Windows-safe)
+
 
