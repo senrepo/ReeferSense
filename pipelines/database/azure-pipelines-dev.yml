@@ -127,39 +127,47 @@ stages:
     - powershell: |
         $ErrorActionPreference = 'Stop'
 
-        # Resolve DACPAC path from downloaded artifact
+        # Resolve DACPAC from downloaded artifact
         $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
         if (-not (Test-Path $dacpac)) {
-          Write-Host "Contents of $(Pipeline.Workspace)\dacpac:"
-          Get-ChildItem -Path "$(Pipeline.Workspace)\dacpac" -Recurse | ForEach-Object { $_.FullName }
-          throw "DACPAC not found at $dacpac"
+          Write-Host "Expected DACPAC at: $dacpac"
+          Write-Host "Listing $(Pipeline.Workspace)\dacpac for debugging:"
+          Get-ChildItem -Path "$(Pipeline.Workspace)\dacpac" -File | ForEach-Object { $_.FullName }
+          throw "DACPAC not found."
         }
 
-        # Ensure ACR credentials are present (from variable group)
-        if (-not "$(acrLoginServer)" -or -not "$(acrUsername)" -or -not "$(acrPassword)") {
-          throw "ACR credentials missing: ensure acrLoginServer, acrUsername, acrPassword are defined in your variable group."
-        }
-
-        # ORAS login using basic auth (reliable on Windows)
-        Write-Host "oras login to $(acrLoginServer) as $(acrUsername)"
+        # Login with basic auth (already succeeded earlier)
         oras login "$(acrLoginServer)" --username "$(acrUsername)" --password "$(acrPassword)"
 
-        # Build target refs
         $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
-        Write-Host "Targets:`n  SHA: $refSha`n  Latest: $refLatest"
+        $artifactType = 'application/vnd.microsoft.dacpac'
 
-        # Windows-safe push: cd to file's directory and pass only the filename in file:mediaType
+        # Switch to the DACPAC's directory and push using ONLY the filename
         $dir  = Split-Path $dacpac -Parent
         $file = Split-Path $dacpac -Leaf
+
+        if ([string]::IsNullOrWhiteSpace($file)) {
+          throw "Resolved filename is empty. dacpac=`$dacpac dir=`$dir"
+        }
+
         Push-Location $dir
         try {
-          Write-Host "Pushing (SHA)…"
-          oras push "$refSha" --artifact-type application/vnd.microsoft.dacpac "$file:application/vnd.microsoft.dacpac"
+          if (-not (Test-Path $file)) {
+            Write-Host "Directory contents of $dir:"
+            Get-ChildItem -File | ForEach-Object { $_.FullName }
+            throw "File '$file' not found in '$dir'."
+          }
+
+          # Build the spec as ONE argument to avoid splitting/empty value
+          $spec = "$file:$artifactType"
+
+          Write-Host "Pushing (SHA): $refSha with spec '$spec'"
+          oras push "$refSha" --artifact-type $artifactType $spec
           if ($LASTEXITCODE -ne 0) { throw "oras push (SHA) failed with exit code $LASTEXITCODE" }
 
-          Write-Host "Pushing (latest)…"
-          oras push "$refLatest" --artifact-type application/vnd.microsoft.dacpac "$file:application/vnd.microsoft.dacpac"
+          Write-Host "Pushing (latest): $refLatest with spec '$spec'"
+          oras push "$refLatest" --artifact-type $artifactType $spec
           if ($LASTEXITCODE -ne 0) { throw "oras push (latest) failed with exit code $LASTEXITCODE" }
         }
         finally {
@@ -167,7 +175,8 @@ stages:
         }
 
         Write-Host "Done: $refSha and $refLatest"
-      displayName: Push DACPAC to ACR (basic auth, Windows-safe)
+      displayName: Push DACPAC to ACR (Windows-safe, hardened)
+
 
 
 
