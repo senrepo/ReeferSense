@@ -96,7 +96,7 @@ stages:
     - task: AzureCLI@2
       displayName: Azure login (expose SP creds)
       inputs:
-        azureSubscription: '$(azureServiceConnection)'   # from env-dev group
+        azureSubscription: '$(azureSubscription)'   # from env-dev group
         scriptType: ps
         addSpnToEnvironment: true                        # <-- injects servicePrincipalId/Key/TenantId into env
         scriptLocation: inlineScript
