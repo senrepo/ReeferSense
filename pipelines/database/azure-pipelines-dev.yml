@@ -154,7 +154,7 @@ stages:
         Push-Location $dir
         try {
           if (-not (Test-Path $file)) {
-            Write-Host "Directory contents of $dir:"
+            Write-Host "Directory contents of $dir"
             Get-ChildItem -File | ForEach-Object { $_.FullName }
             throw "File '$file' not found in '$dir'."
           }
