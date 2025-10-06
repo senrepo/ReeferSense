@@ -141,7 +141,7 @@ stages:
         $dacpac = "$(Pipeline.Workspace)\dacpac\$(dacpacFileName)"
         if (-not (Test-Path $dacpac)) { throw "DACPAC not found at $dacpac" }
 
-        az acr login --name "$(acrLoginServer)"   # ACR *name*, not login server
+        az acr login --name "acrReeferDev"   # ACR *name*, not login server
 
         $refSha    = "$(acrLoginServer)/$(acrRepository):$(acrTag)"
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
