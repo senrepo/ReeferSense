@@ -160,7 +160,7 @@ stages:
           }
 
           # Build the spec as ONE argument to avoid splitting/empty value
-          $spec = "$file:$artifactType"
+          $spec = "${file}:$artifactType"
 
           Write-Host "Pushing (SHA): $refSha with spec '$spec'"
           oras push "$refSha" --artifact-type $artifactType $spec
