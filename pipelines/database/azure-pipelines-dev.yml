@@ -239,7 +239,7 @@ stages:
         try {
           Write-Host "Pulling $refLatest → $pullDir"
           # Pull all content attached to the artifact (oras pull has no --artifact-type flag)
-          oras pull "$refLatest" -a
+          oras pull "$refLatest"
 
           # Prefer a *.dacpac file; fallback to MIME-type-named file if needed
           $dacpac = Get-ChildItem -Path . -Recurse -File -Filter *.dacpac | Select-Object -First 1
