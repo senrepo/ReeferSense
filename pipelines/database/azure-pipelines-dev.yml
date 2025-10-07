@@ -282,7 +282,6 @@ stages:
         AdditionalArguments: >
           /p:BlockOnPossibleDataLoss=false
           /p:CreateNewDatabase=false
-          /p:TargetServerVersion=AzureV12
           /v:Environment=Development
         IpDetectionMethod: 'AutoDetect'
 
