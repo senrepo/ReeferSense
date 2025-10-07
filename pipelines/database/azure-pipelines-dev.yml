@@ -177,6 +177,109 @@ stages:
         Write-Host "Done: $refSha and $refLatest"
       displayName: Push DACPAC to ACR
 
+# -------- Deploy to Azure SQL (pull *latest* DACPAC from ACR) --------
+- stage: DeploySql
+  displayName: ACR → Azure SQL (Dev)
+  dependsOn: Release
+  condition: and( succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest') )
+  jobs:
+  - job: deploy_from_acr
+    displayName: Pull latest DACPAC from ACR and deploy
+    variables:
+      ORAS_VERSION: '1.3.0'   # pin ORAS for repeatability
+    steps:
+    # Install ORAS CLI on the agent
+    - powershell: |
+        $ErrorActionPreference = 'Stop'
+        $ver      = '$(ORAS_VERSION)'
+        $tmp      = $env:AGENT_TEMPDIRECTORY
+        $zip      = Join-Path $tmp "oras_$ver.zip"
+        $url      = "https://github.com/oras-project/oras/releases/download/v$ver/oras_${ver}_windows_amd64.zip"
+        $extract  = Join-Path $tmp "oras_$ver"
+        $bindir   = Join-Path $tmp "oras-bin"
+
+        Write-Host "Downloading ORAS $ver from $url"
+        Invoke-WebRequest -Uri $url -OutFile $zip
+        if (Test-Path $extract) { Remove-Item -Recurse -Force $extract }
+        Expand-Archive -Path $zip -DestinationPath $extract -Force
+
+        $orasExe = Get-ChildItem -Path $extract -Recurse -File -Filter 'oras.exe' | Select-Object -First 1
+        if (-not $orasExe) { throw "oras.exe not found under $extract" }
+
+        if (!(Test-Path $bindir)) { New-Item -ItemType Directory -Path $bindir | Out-Null }
+        Copy-Item -Path $orasExe.FullName -Destination (Join-Path $bindir 'oras.exe') -Force
+
+        # Make ORAS available now and to subsequent tasks
+        $env:PATH = "$bindir;$env:PATH"
+        Write-Host "##vso[task.prependpath]$bindir"
+
+        & (Join-Path $bindir 'oras.exe') version
+      displayName: Install ORAS (Windows)
+
+    # ORAS login (using ACR admin or repo-scoped token credentials from Library variable group)
+    - powershell: |
+        $ErrorActionPreference = 'Stop'
+        if (-not "$(acrLoginServer)" -or -not "$(acrUsername)" -or -not "$(acrPassword)") {
+          throw "Missing ACR credentials. Ensure acrLoginServer, acrUsername, acrPassword exist in the variable group."
+        }
+
+        Write-Host "oras login to $(acrLoginServer) as $(acrUsername)"
+        oras login "$(acrLoginServer)" --username "$(acrUsername)" --password "$(acrPassword)"
+      displayName: ORAS login (ACR)
+
+    # Pull latest DACPAC from ACR and expose its full path as an output variable
+    - powershell: |
+        $ErrorActionPreference = 'Stop'
+        $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
+        $pullDir   = Join-Path $env:AGENT_TEMPDIRECTORY "dacpac-pull"
+
+        if (Test-Path $pullDir) { Remove-Item -Recurse -Force $pullDir }
+        New-Item -ItemType Directory -Path $pullDir | Out-Null
+
+        Push-Location $pullDir
+        try {
+          Write-Host "Pulling $refLatest → $pullDir"
+          oras pull "$refLatest" --artifact-type application/vnd.microsoft.dacpac
+
+          # Find the pulled .dacpac (expect exactly one)
+          $dacpac = Get-ChildItem -Path . -Recurse -File -Filter *.dacpac | Select-Object -First 1
+          if (-not $dacpac) {
+            Write-Host "Pulled files:"; Get-ChildItem -Path . -Recurse | ForEach-Object { $_.FullName }
+            throw "No .dacpac found after ORAS pull."
+          }
+
+          $full = $dacpac.FullName
+          Write-Host "Pulled DACPAC: $full"
+          Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$full"
+        }
+        finally {
+          Pop-Location
+        }
+      name: fromAcr
+      displayName: Pull latest DACPAC from ACR
+
+    # (Optional) If your SQL server firewall blocks the agent, open a temporary rule here,
+    # and remove it afterward. Skipped here to keep things simple.
+
+    # Deploy the pulled DACPAC to Azure SQL (SQL auth via Library group secrets)
+    - task: SqlAzureDacpacDeployment@1
+      displayName: Deploy DACPAC → Azure SQL (Dev)
+      inputs:
+        azureSubscription: ''                 # leave blank for SQL auth
+        AuthenticationType: 'server'          # SQL authentication
+        ServerName: '$(sqlServerName)'        # e.g., reefer-sense.database.windows.net (from variable group)
+        DatabaseName: '$(sqlDatabaseName)'    # e.g., ReeferSense_Dev (from variable group)
+        SqlUsername: '$(sqlUsername)'         # secret in Library group
+        SqlPassword: '$(sqlPassword)'         # secret in Library group
+        deployType: 'DacpacTask'
+        DacpacFile: '$(fromAcr.DacpacPath)'   # use file we just pulled from ACR
+        AdditionalArguments: >
+          /p:BlockOnPossibleDataLoss=false
+          /p:CreateNewDatabase=false
+          /v:Environment=Development
+        IpDetectionMethod: 'AutoDetect'
+
+
 
 
 
