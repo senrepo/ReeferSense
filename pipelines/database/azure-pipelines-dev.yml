@@ -49,7 +49,10 @@ stages:
       displayName: Build SQL Project
       inputs:
         solution: '$(project)'
-        msbuildArgs: '/p:Configuration=$(buildConfiguration)'
+        msbuildArgs: >-
+          /p:Configuration=$(buildConfiguration)
+          /p:TargetDatabaseEngineType=SqlAzure
+          /p:TargetServerVersion=AzureV12
         platform: 'Any CPU'
         configuration: '$(buildConfiguration)'
 
