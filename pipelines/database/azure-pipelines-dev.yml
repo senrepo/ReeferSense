@@ -268,7 +268,7 @@ stages:
     - task: SqlAzureDacpacDeployment@1
       displayName: Deploy DACPAC → Azure SQL (Dev)
       inputs:
-        azureSubscription: ''                 # SQL auth (no ARM conn needed)
+        azureSubscription:  $(azureSubscription)                 # SQL auth (no ARM conn needed)
         AuthenticationType: 'server'
         ServerName: '$(sqlServerName)'        # e.g., reefer-sense.database.windows.net
         DatabaseName: '$(sqlDatabaseName)'
