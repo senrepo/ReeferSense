@@ -177,7 +177,7 @@ stages:
         Write-Host "Done: $refSha and $refLatest"
       displayName: Push DACPAC to ACR
 
-# -------- Deploy to Azure SQL (pull *latest* DACPAC from ACR) --------
+# -------- Deploy to Azure SQL (pull *latest* DACPAC from ACR with robust fallback) --------
 - stage: DeploySql
   displayName: ACR → Azure SQL (Dev)
   dependsOn: Release
@@ -186,9 +186,9 @@ stages:
   - job: deploy_from_acr
     displayName: Pull latest DACPAC from ACR and deploy
     variables:
-      ORAS_VERSION: '1.3.0'
+      ORAS_VERSION: '1.3.0'   # pin ORAS for repeatability
     steps:
-    # Install ORAS CLI on the agent
+    # Install ORAS CLI on the agent (Windows)
     - powershell: |
         $ErrorActionPreference = 'Stop'
         $ver      = '$(ORAS_VERSION)'
@@ -197,15 +197,22 @@ stages:
         $url      = "https://github.com/oras-project/oras/releases/download/v$ver/oras_${ver}_windows_amd64.zip"
         $extract  = Join-Path $tmp "oras_$ver"
         $bindir   = Join-Path $tmp "oras-bin"
+
+        Write-Host "Downloading ORAS $ver from $url"
         Invoke-WebRequest -Uri $url -OutFile $zip
         if (Test-Path $extract) { Remove-Item -Recurse -Force $extract }
         Expand-Archive -Path $zip -DestinationPath $extract -Force
+
         $orasExe = Get-ChildItem -Path $extract -Recurse -File -Filter 'oras.exe' | Select-Object -First 1
         if (-not $orasExe) { throw "oras.exe not found under $extract" }
+
         if (!(Test-Path $bindir)) { New-Item -ItemType Directory -Path $bindir | Out-Null }
         Copy-Item -Path $orasExe.FullName -Destination (Join-Path $bindir 'oras.exe') -Force
+
+        # Make ORAS available now and to subsequent tasks
         $env:PATH = "$bindir;$env:PATH"
         Write-Host "##vso[task.prependpath]$bindir"
+
         & (Join-Path $bindir 'oras.exe') version
       displayName: Install ORAS (Windows)
 
@@ -215,36 +222,45 @@ stages:
         if (-not "$(acrLoginServer)" -or -not "$(acrUsername)" -or -not "$(acrPassword)") {
           throw "Missing ACR credentials: acrLoginServer, acrUsername, acrPassword."
         }
+        Write-Host "oras login to $(acrLoginServer) as $(acrUsername)"
         oras login "$(acrLoginServer)" --username "$(acrUsername)" --password "$(acrPassword)"
       displayName: ORAS login (ACR)
 
-    # Pull latest DACPAC from ACR (use -a to pull all files; no --artifact-type on pull)
+    # Pull latest DACPAC from ACR and expose its full path (with fallback if filename isn't *.dacpac)
     - powershell: |
         $ErrorActionPreference = 'Stop'
         $refLatest = "$(acrLoginServer)/$(acrRepository):latest"
         $pullDir   = Join-Path $env:AGENT_TEMPDIRECTORY "dacpac-pull"
+
         if (Test-Path $pullDir) { Remove-Item -Recurse -Force $pullDir }
         New-Item -ItemType Directory -Path $pullDir | Out-Null
 
         Push-Location $pullDir
         try {
           Write-Host "Pulling $refLatest → $pullDir"
-          # pull all content attached to the artifact
+          # Pull all content attached to the artifact (oras pull has no --artifact-type flag)
           oras pull "$refLatest" -a
 
-          # locate the pulled dacpac
+          # Prefer a *.dacpac file; fallback to MIME-type-named file if needed
           $dacpac = Get-ChildItem -Path . -Recurse -File -Filter *.dacpac | Select-Object -First 1
           if (-not $dacpac) {
-            Write-Host "Pulled files (none matched *.dacpac):"
+            Write-Host "No *.dacpac found; checking for MIME-type named files (application*)..."
+            $dacpac = Get-ChildItem -Path . -Recurse -File -Filter 'application*' | Select-Object -First 1
+          }
+
+          if (-not $dacpac) {
+            Write-Host "Pulled files (none matched):"
             Get-ChildItem -Path . -Recurse | ForEach-Object { $_.FullName }
-            throw "No .dacpac found after ORAS pull."
+            throw "No DACPAC file found after ORAS pull."
           }
 
           $full = $dacpac.FullName
           Write-Host "Pulled DACPAC: $full"
           Write-Host "##vso[task.setvariable variable=DacpacPath;isOutput=true]$full"
         }
-        finally { Pop-Location }
+        finally {
+          Pop-Location
+        }
       name: fromAcr
       displayName: Pull latest DACPAC from ACR
 
@@ -265,6 +281,7 @@ stages:
           /p:CreateNewDatabase=false
           /v:Environment=Development
         IpDetectionMethod: 'AutoDetect'
+
 
 
 
