@@ -22,7 +22,7 @@ variables:
 - group: database-dev
 
 - name: project
-  value: sql_server_data_access/sql_server_data_access.csproj
+  value: sql-server-data-access/sql-server-data-access.csproj
 - name: buildConfiguration
   value: Release
 - name: packageVersion
