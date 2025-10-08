@@ -1,4 +1,4 @@
-﻿# Azure DevOps pipeline: pack a .NET Standard 2.1 library and publish to Azure Artifacts feed "ReeferSense"
+# Azure DevOps pipeline: pack a .NET Standard 2.1 library and publish to Azure Artifacts feed "ReeferSense"
 
 pool:
   vmImage: ubuntu-latest
