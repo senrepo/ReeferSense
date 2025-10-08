@@ -1,0 +1,105 @@
+﻿# Azure DevOps pipeline: pack a .NET Standard 2.1 library and publish to Azure Artifacts feed "ReeferSense"
+
+pool:
+  vmImage: ubuntu-latest
+
+trigger:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - sql-server-data-access/**
+      - pipelines/database/**
+
+pr:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - sql-server-data-access/**
+      - pipelines/database/**
+
+variables:
+- group: env-dev 
+- group: database-dev
+
+- name: project
+  value: sql_server_data_access/sql_server_data_access.csproj
+- name: buildConfiguration
+  value: Release
+- name: packageVersion
+  value: $(Date:yyyyMMdd).$(Rev:r)
+
+# Give the run a readable name that matches the package version
+name: $(packageVersion)
+
+stages:
+
+# 1) Build & Pack (runs on pushes and PRs)
+- stage: Build
+  displayName: Build & Pack (.NET Standard 2.1)
+  jobs:
+  - job: build_pack
+    displayName: dotnet build + pack
+    steps:
+    - checkout: self
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK (latest LTS)'
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'        # works fine for netstandard2.1 projects
+
+    - script: |
+        dotnet --info
+        dotnet restore "$(project)"
+      displayName: 'Restore'
+
+    - script: |
+        dotnet build "$(project)" -c "$(buildConfiguration)" --no-restore
+      displayName: 'Build'
+
+    # Optional tests (uncomment if you have test projects)
+    # - script: |
+    #     dotnet test tests/YourTests.csproj -c "$(buildConfiguration)" --no-build --logger trx
+    #   displayName: 'Test'
+
+    - script: |
+        dotnet pack "$(project)" \
+          -c "$(buildConfiguration)" \
+          -o "$(Build.ArtifactStagingDirectory)" \
+          /p:PackageVersion="$(packageVersion)" \
+          /p:ContinuousIntegrationBuild=true
+      displayName: 'Pack (create .nupkg)'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish nupkg as pipeline artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'nuget'
+        publishLocation: 'pipeline'
+
+# 2) Publish to Azure Artifacts (skips PRs; only on dev branch)
+- stage: Publish
+  displayName: 'Publish package → Azure Artifacts (ReeferSense)'
+  dependsOn: Build
+  condition: and( succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest') )
+  jobs:
+  - job: push_to_feed
+    displayName: 'NuGet push to Azure Artifacts'
+    steps:
+    # Auth for Azure Artifacts feeds (injects credentials for dotnet/nuget)
+    - task: NuGetAuthenticate@1
+      displayName: 'NuGet Authenticate (Azure Artifacts)'
+
+    # Download the packaged artifact from previous stage
+    - download: current
+      artifact: nuget
+
+    # Push all nupkgs from the artifact folder to the feed
+    - script: |
+        echo "Feed URL: $(feedUrl)"
+        echo "Pushing packages from: $(Pipeline.Workspace)/nuget"
+        dotnet nuget push "$(Pipeline.Workspace)/nuget/*.nupkg" \
+          --source "$(feedUrl)" \
+          --api-key AzureArtifacts \
+          --skip-duplicate
+      displayName: 'dotnet nuget push (skip duplicates)'

@@ -43,6 +43,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{9304B687-1B99-41A1-BCD5-F580FF643DEA}"
 	ProjectSection(SolutionItems) = preProject
 		pipelines\database\azure-pipelines-dev.yml = pipelines\database\azure-pipelines-dev.yml
+		pipelines\database\azure-pipelines-sqlaccess-dev.yml = pipelines\database\azure-pipelines-sqlaccess-dev.yml
 	EndProjectSection
 EndProject
 Global
