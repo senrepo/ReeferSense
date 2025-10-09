@@ -22,7 +22,11 @@ jobs:
       path: $(HOME)/.nuget/packages
 
   # Restore ONLY the project (not the whole solution)
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate (Azure Artifacts)'
+
   - script: >
+        dotnet nuget list source &&
         dotnet restore "${{ parameters.project }}"
         --source "$(feedUrl)"
     displayName: Restore (project)
