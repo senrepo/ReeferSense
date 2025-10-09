@@ -54,7 +54,7 @@ stages:
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   # 1) Build & push Docker image
-  - template: docker-buildpush.yml
+  - template: ../templates/docker-buildpush.yml
     parameters:
       containerRegistryServiceConnection: $(acrServiceConnection)   # from env-dev var group
       repository: $(imageName)
@@ -62,7 +62,7 @@ stages:
       buildContext: '$(Build.SourcesDirectory)'
 
   # 2) Create-if-missing OR update Container App (job template call)
-  - template: ../templates/deploy-aca.yml
+  - template: deploy-aca.yml
     parameters:
       dependsOn: docker_build_push            # must match the job name in docker template
       acrLoginServer:   $(acrLoginServer)
