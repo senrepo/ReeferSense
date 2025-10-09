@@ -1,0 +1,71 @@
+# /pipelines/iot-data-processor/azure-pipelines-dev.yml
+
+# Ensure all jobs have an agent (deploy job relies on this)
+pool:
+  vmImage: ubuntu-latest
+
+trigger:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - iot-data-processor/**
+      - iot-data-processor/Dockerfile
+      - pipelines/iot-data-processor/**
+      - pipelines/templates/**
+
+pr:
+  branches: { include: [ dev ] }
+  paths:
+    include:
+      - iot-data-processor/**
+      - iot-data-processor/Dockerfile
+      - pipelines/iot-data-processor/**
+      - pipelines/templates/**
+
+# Load env-level first, then project-level (project overrides if collision)
+variables:
+- group: env-dev
+- group: iot-data-processor-dev
+
+# Repo-specific values
+- name: project
+  value: iot-data-processor/iot-data-processor.csproj
+- name: dockerfilePath
+  value: $(Build.SourcesDirectory)/iot-data-processor/Dockerfile
+- name: imageName
+  value: iot-data-processor
+- name: buildConfiguration
+  value: Release
+
+stages:
+# -------- Build for push & PR --------
+- stage: Build
+  displayName: Build iot-data-processor (Dev)
+  jobs:
+  - template: ../templates/build-dotnet.yml
+    parameters:
+      project: $(project)
+      configuration: $(buildConfiguration)
+
+# -------- Release (skip on PRs) --------
+- stage: Release
+  displayName: Docker → ACR → ACA (Dev)
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  # 1) Build & push Docker image
+  - template: ../templates/docker-buildpush.yml
+    parameters:
+      containerRegistryServiceConnection: $(acrServiceConnection)   # from env-dev var group
+      repository: $(imageName)
+      dockerfilePath: $(dockerfilePath)
+      buildContext: '$(Build.SourcesDirectory)'
+
+  # 2) Create-if-missing OR update Container App (job template call)
+  - template: ../templates/deploy-aca.yml
+    parameters:
+      dependsOn: docker_build_push            # must match the job name in docker template
+      acrLoginServer:   $(acrLoginServer)
+      resourceGroup:    $(resourceGroup)
+      containerApp:     $(containerApp)
+      acaEnvironment:   $(acaEnvironment)

@@ -46,6 +46,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{93
 		pipelines\database\azure-pipelines-sqlaccess-dev.yml = pipelines\database\azure-pipelines-sqlaccess-dev.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "iot-data-processor", "iot-data-processor", "{A371380E-8441-4477-A376-F5D41B6D45C5}"
+	ProjectSection(SolutionItems) = preProject
+		pipelines\iot-data-processor\azure-pipelines-iot-data-processor-dev.yml = pipelines\iot-data-processor\azure-pipelines-iot-data-processor-dev.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +91,7 @@ Global
 		{FEE3D20C-12B3-44AD-B2A7-4938F35A4E8B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AB753C13-27B5-4E24-A08E-2661EBDC29A4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9304B687-1B99-41A1-BCD5-F580FF643DEA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{A371380E-8441-4477-A376-F5D41B6D45C5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8513E262-E852-481D-A641-195F4102C67A}
