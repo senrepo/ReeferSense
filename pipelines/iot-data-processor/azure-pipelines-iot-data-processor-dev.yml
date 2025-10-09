@@ -62,7 +62,7 @@ stages:
       buildContext: '$(Build.SourcesDirectory)'
 
   # 2) Create-if-missing OR update Container App (job template call)
-  - template: ../templates/deploy-aca.yml
+  - template: deploy-iot-data-processor-aca.yml
     parameters:
       dependsOn: docker_build_push            # must match the job name in docker template
       acrLoginServer:   $(acrLoginServer)

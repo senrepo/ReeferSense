@@ -49,6 +49,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "iot-data-processor", "iot-data-processor", "{A371380E-8441-4477-A376-F5D41B6D45C5}"
 	ProjectSection(SolutionItems) = preProject
 		pipelines\iot-data-processor\azure-pipelines-iot-data-processor-dev.yml = pipelines\iot-data-processor\azure-pipelines-iot-data-processor-dev.yml
+		pipelines\iot-data-processor\deploy-iot-data-processor-aca.yml = pipelines\iot-data-processor\deploy-iot-data-processor-aca.yml
 	EndProjectSection
 EndProject
 Global
