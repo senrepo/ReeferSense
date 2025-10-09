@@ -22,7 +22,9 @@ jobs:
       path: $(HOME)/.nuget/packages
 
   # Restore ONLY the project (not the whole solution)
-  - script: dotnet restore "${{ parameters.project }}"
+  - script: >
+        dotnet restore "${{ parameters.project }}"
+        --source "$(feedUrl)"
     displayName: Restore (project)
 
   # Build ONLY the project (will still build its referenced projects if needed)
