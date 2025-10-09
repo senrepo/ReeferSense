@@ -32,4 +32,6 @@ jobs:
       containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
       Dockerfile: ${{ parameters.dockerfilePath }}
       buildContext: ${{ parameters.buildContext }}
+      arguments: >
+        --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)
       tags: ${{ parameters.tags }}
