@@ -9,9 +9,12 @@ WORKDIR /app
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
+
 WORKDIR /src
 COPY ["iot-data-processor/iot-data-processor.csproj", "iot-data-processor/"]
-RUN dotnet restore "./iot-data-processor/iot-data-processor.csproj"
+RUN dotnet restore "./iot-data-processor/iot-data-processor.csproj --configfile ../nuget.config"
 COPY . .
 WORKDIR "/src/iot-data-processor"
 RUN dotnet build "./iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/build
