@@ -1,32 +1,46 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# syntax=docker/dockerfile:1.4
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
 WORKDIR /app
 
-
-# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 ARG VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
 ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
 
 WORKDIR /src
-COPY nuget.config /src/nuget.config
-COPY ["iot-data-processor/iot-data-processor.csproj", "iot-data-processor/"]
-RUN dotnet restore "./iot-data-processor/iot-data-processor.csproj" --configfile nuget.config
-COPY . .
-WORKDIR "/src/iot-data-processor"
-RUN dotnet build "./iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
 
-# This stage is used to publish the service project to be copied to the final stage
+# --- Put a NuGet.config WITH PROJECT-SCOPED FEED URL in the repo root ---
+# (Ensure the file in your repo has the URL below.)
+# <configuration>
+#   <packageSources>
+#     <add key="AzureArtifacts" value="https://pkgs.dev.azure.com/senazuredemo/ReeferSense/_packaging/ReeferSense/nuget/v3/index.json" />
+#     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+#   </packageSources>
+# </configuration>
+COPY NuGet.config /src/NuGet.config
+
+# Copy only csproj first (layer caching)
+COPY iot-data-processor/iot-data-processor.csproj iot-data-processor/
+
+# --- DEBUG: show what the container sees (remove after it works) ---
+RUN echo "NuGet.config content:" \
+ && cat /src/NuGet.config \
+ && echo "Auth JSON length: " $(echo -n "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)
+
+# Restore with config + built-in credential provider (uses env JSON)
+RUN dotnet restore "iot-data-processor/iot-data-processor.csproj" --configfile /src/NuGet.config
+
+# Copy the rest and build
+COPY . .
+WORKDIR /src/iot-data-processor
+RUN dotnet build "iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/build --no-restore
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/publish --no-restore /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "iot-data-processor.dll"]
+ENTRYPOINT ["dotnet","iot-data-processor.dll"]
