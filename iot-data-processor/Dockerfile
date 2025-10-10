@@ -13,7 +13,7 @@ ARG VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
 ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
 
 WORKDIR /src
-COPY NuGet.config /src/NuGet.config
+COPY nuget.config /src/nuget.config
 COPY ["iot-data-processor/iot-data-processor.csproj", "iot-data-processor/"]
 RUN dotnet restore "./iot-data-processor/iot-data-processor.csproj" --configfile nuget.config
 COPY . .
