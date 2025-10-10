@@ -33,5 +33,5 @@ jobs:
       Dockerfile: ${{ parameters.dockerfilePath }}
       buildContext: '$(Build.SourcesDirectory)'
       arguments: >
-        --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)
+        --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)"
       tags: ${{ parameters.tags }}

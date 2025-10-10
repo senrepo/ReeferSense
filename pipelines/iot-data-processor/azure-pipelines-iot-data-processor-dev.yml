@@ -2,7 +2,7 @@
 
 # Ensure all jobs have an agent (deploy job relies on this)
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 trigger:
   branches: { include: [ dev ] }
