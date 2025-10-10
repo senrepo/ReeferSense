@@ -1,9 +1,9 @@
 # /pipelines/templates/docker-buildpush.yml
 parameters:
-  containerRegistryServiceConnection: ''   # e.g., 'acr-dev'
-  repository: ''                           # e.g., 'iot-gateway'
-  dockerfilePath: ''                       # e.g., 'Dockerfile.iogw'
-  buildContext: '$(Pipeline.Workspace)/publish/app'   # default context from publish
+  containerRegistryServiceConnection: ''                 # e.g., 'acr-dev'
+  repository: ''                                         # e.g., 'iot-gateway'
+  dockerfilePath: ''                                     # e.g., 'Dockerfile.iogw'
+  buildContext: '$(Pipeline.Workspace)/publish/app'      # default context from publish
   tags: |
     $(Build.SourceBranchName)-$(Build.BuildId)
     $(Build.SourceBranchName)-latest
@@ -23,27 +23,27 @@ jobs:
 
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate (Azure Artifacts)'
-  inputs:
-    nuGetConfigPath: 'NuGet.config'        
+    inputs:
+      nuGetConfigPath: 'NuGet.config'    # or use: nuGetServiceConnections: 'Your-Azure-Artifacts-Connection'
 
-- script: |
-    if [ -z "$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)" ]; then
-      echo "Var is EMPTY at agent scope"
-      exit 1
-    else
-      echo "Var length: ${#VSS_NUGET_EXTERNAL_FEED_ENDPOINTS}"
-    fi
-  displayName: "Check VSS_NUGET_EXTERNAL_FEED_ENDPOINTS at agent"
-  shell: bash
+  - script: |
+      if [ -z "$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)" ]; then
+        echo "Var is EMPTY at agent scope"
+        exit 1
+      else
+        echo "Var length: ${#VSS_NUGET_EXTERNAL_FEED_ENDPOINTS}"
+      fi
+    displayName: "Check VSS_NUGET_EXTERNAL_FEED_ENDPOINTS at agent"
+    shell: bash
 
-- task: Docker@2
-  displayName: Build & Push
-  inputs:
-    command: buildAndPush
-    repository: ${{ parameters.repository }}
-    containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
-    Dockerfile: ${{ parameters.dockerfilePath }}
-    buildContext: '$(Build.SourcesDirectory)'
-    arguments: >
-      --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)"
-    tags: ${{ parameters.tags }}
+  - task: Docker@2
+    displayName: Build & Push
+    inputs:
+      command: buildAndPush
+      repository: ${{ parameters.repository }}
+      containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
+      Dockerfile: ${{ parameters.dockerfilePath }}
+      buildContext: ${{ parameters.buildContext }}
+      arguments: >
+        --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)"
+      tags: ${{ parameters.tags }}
