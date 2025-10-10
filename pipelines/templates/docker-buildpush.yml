@@ -24,17 +24,17 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate (Azure Artifacts)'
     inputs:
-      nuGetConfigPath: 'NuGet.config'    # or use: nuGetServiceConnections: 'Your-Azure-Artifacts-Connection'
+      nuGetConfigPath: 'NuGet.config'
 
   - script: |
-      if [ -z "$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)" ]; then
+      if [ -z "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" ]; then
         echo "Var is EMPTY at agent scope"
         exit 1
       else
         echo "Var length: ${#VSS_NUGET_EXTERNAL_FEED_ENDPOINTS}"
       fi
     displayName: "Check VSS_NUGET_EXTERNAL_FEED_ENDPOINTS at agent"
-    shell: bash
+    shell: bash 
 
   - task: Docker@2
     displayName: Build & Push
