@@ -31,7 +31,7 @@ jobs:
       repository: ${{ parameters.repository }}
       containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
       Dockerfile: ${{ parameters.dockerfilePath }}
-      buildContext: ${{ parameters.buildContext }}
+      buildContext: '$(Build.SourcesDirectory)'
       arguments: >
         --build-arg VSS_NUGET_EXTERNAL_FEED_ENDPOINTS=$(VSS_NUGET_EXTERNAL_FEED_ENDPOINTS)
       tags: ${{ parameters.tags }}
