@@ -24,6 +24,7 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate (Azure Artifacts)'
     inputs:
+      nuGetServiceConnections: 'ReeferSense-Artifacts-Connection' 
       nuGetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
 
   - bash: |
