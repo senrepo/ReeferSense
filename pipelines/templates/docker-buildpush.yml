@@ -31,7 +31,7 @@ jobs:
         if [ -n "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" ]; then
             echo "${VSS_NUGET_EXTERNAL_FEED_ENDPOINTS}"
             auth_b64="$(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | base64 -w0 2>/dev/null || printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | base64)"
-            echo "##vso[task.setvariable variable=nugetAuthB64;issecret=true]$auth_b64"
+            echo "##vso[task.setvariable variable=NUGET_AUTH_B64;issecret=true]$auth_b64"
         else
             echo "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS is EMPTY at agent scope"
             exit 1         
@@ -48,5 +48,5 @@ jobs:
       Dockerfile: ${{ parameters.dockerfilePath }}
       buildContext: '$(Build.SourcesDirectory)'
       arguments: >
-        --build-arg NUGET_AUTH_B64=$(nugetAuthB64)
+        --build-arg NUGET_AUTH_B64
       tags: ${{ parameters.tags }}
