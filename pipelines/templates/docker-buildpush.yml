@@ -34,7 +34,7 @@ jobs:
         # base64 (single line, no wraps)
         auth_b64="$(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | base64 -w0 2>/dev/null || printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | base64)"
         echo "##vso[task.setvariable variable=nugetAuthB64;issecret=true]$auth_b64"
-        echo "Promoted nugetAuthB64 (masked)"
+        echo "Promoted nugetAuthB64 (masked) - $(nugetAuthB64)"
     displayName: "Encode & promote NuGet auth JSON"
 
 
