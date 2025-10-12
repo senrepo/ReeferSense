@@ -11,12 +11,10 @@ ARG NUGET_AUTH_B64
 COPY NuGet.config /src/NuGet.config
 COPY iot-data-processor/iot-data-processor.csproj iot-data-processor/
 
-# Decode -> export env -> restore (all in one layer)
-RUN set -e; \
-    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(printf %s "$NUGET_AUTH_B64" | base64 -d)"; \
-    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)"; \
-    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS; \
-    dotnet restore "iot-data-processor/iot-data-processor.csproj" --configfile /src/NuGet.config
+RUN --mount=type=secret,id=nuget_auth \
+    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(cat /run/secrets/nuget_auth)" && \
+    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)" && \
+    dotnet restore iot-data-processor/iot-data-processor.csproj --configfile /src/NuGet.config
 
 # Copy the rest and build
 COPY . .
