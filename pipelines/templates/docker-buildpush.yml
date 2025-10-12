@@ -24,7 +24,7 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate (Azure Artifacts)'
     inputs:
-      nuGetConfigPath: 'NuGet.config'
+      nuGetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
 
   - bash: |
       if [ -z "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" ]; then
