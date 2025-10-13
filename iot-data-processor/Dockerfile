@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+﻿# syntax=docker/dockerfile:1.4
 
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 WORKDIR /app
@@ -6,15 +6,18 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+# receive the arg
 ARG NUGET_AUTH_B64
 
 COPY NuGet.config /src/NuGet.config
 COPY iot-data-processor/iot-data-processor.csproj iot-data-processor/
 
-RUN --mount=type=secret,id=nuget_auth \
-    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(cat /run/secrets/nuget_auth)" && \
-    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)" && \
-    dotnet restore iot-data-processor/iot-data-processor.csproj --configfile /src/NuGet.config
+# decode → export → restore in the SAME layer
+RUN set -e; \
+    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(printf %s "$NUGET_AUTH_B64" | base64 -d)"; \
+    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)"; \
+    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS; \
+    dotnet restore "iot-data-processor/iot-data-processor.csproj" --configfile /src/NuGet.config
 
 # Copy the rest and build
 COPY . .
