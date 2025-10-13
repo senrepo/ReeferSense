@@ -50,9 +50,15 @@ stages:
         packageType: 'sdk'
         version: '8.0.x'        # works fine for netstandard2.1 projects
 
+    - task: NuGetAuthenticate@1
+      displayName: 'NuGet Authenticate (Azure Artifacts)'
+      inputs:
+        nuGetServiceConnections: 'ReeferSense-Artifacts-Connection'
+        nuGetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+        
     - script: |
         dotnet --info
-        dotnet restore "$(project)"
+        dotnet restore "$(project)" --configfile "$(Build.SourcesDirectory)/NuGet.config"
       displayName: 'Restore'
 
     - script: |
