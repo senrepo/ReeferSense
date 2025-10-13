@@ -59,7 +59,9 @@ stages:
       containerRegistryServiceConnection: $(acrServiceConnection)   # from env-dev var group
       repository: $(imageName)
       dockerfilePath: $(dockerfilePath)
-      buildContext: '$(Build.SourcesDirectory)'
+      projectPath: $(project)
+      entryDll: 'iot-gateway.dll'
+      buildConfiguration: $(buildConfiguration)
 
   # 2) Create-if-missing OR update Container App (job template call)
   - template: deploy-aca.yml
