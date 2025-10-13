@@ -1,19 +1,21 @@
 # /pipelines/templates/docker-buildpush.yml
 parameters:
-  containerRegistryServiceConnection: ''                 # e.g., 'acr-dev'
-  repository: ''                                         # e.g., 'iot-gateway'
-  dockerfilePath: ''                                     # e.g., 'Dockerfile.iogw'
-  buildContext: '$(Pipeline.Workspace)/publish/app'      # default context from publish
+  containerRegistryServiceConnection: ''                  # e.g., 'acr-dev'
+  repository: ''                                          # e.g., 'iot-gateway'
+  dockerfilePath: ''                                      # (unused in runtime-only flow; kept for compatibility)
+  buildContext: '$(Build.SourcesDirectory)/_publish'      # publish output folder
   tags: |
     $(Build.SourceBranchName)-$(Build.BuildId)
     $(Build.SourceBranchName)-latest
+  projectPath: 'iot-data-processor/iot-data-processor.csproj'   # <-- parameterized csproj
+  entryDll: 'iot-data-processor.dll'                             # <-- parameterized DLL name
+  buildConfiguration: 'Release'                                  # optional
 
 jobs:
 - job: docker_build_push
   displayName: Docker Build & Push
   steps:
-  - download: current
-    artifact: publish
+  - checkout: self
 
   - task: Docker@2
     displayName: Login to ACR
@@ -24,33 +26,41 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate (Azure Artifacts)'
     inputs:
-      nuGetServiceConnections: 'ReeferSense-Artifacts-Connection' 
+      nuGetServiceConnections: 'ReeferSense-Artifacts-Connection'
       nuGetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
 
+  # Restore & publish ON THE AGENT using the authenticated client
+  - script: |
+      set -e
+      dotnet --info
+      dotnet restore "${{ parameters.projectPath }}" \
+        --configfile "$(Build.SourcesDirectory)/NuGet.config"
+      dotnet publish  "${{ parameters.projectPath }}" \
+        -c "${{ parameters.buildConfiguration }}" \
+        -o "$(Build.SourcesDirectory)/_publish" \
+        --no-restore \
+        /p:UseAppHost=false
+      ls -la "$(Build.SourcesDirectory)/_publish"
+    displayName: dotnet restore + publish (agent)
+
+  # Create a slim runtime Dockerfile next to the publish output
   - bash: |
-        if [ -n "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" ]; then
-            echo "${VSS_NUGET_EXTERNAL_FEED_ENDPOINTS}"
-            # Write to a file (no output to logs)
-            printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" > "$(Pipeline.Workspace)/nuget_auth.json"
-            # Basic sanity: print byte length only (safe)
-            echo "nuget_auth.json bytes: $(wc -c < "$(Pipeline.Workspace)/nuget_auth.json")"
-        else
-            echo "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS is EMPTY at agent scope"
-            exit 1         
-        fi
-    displayName: "NuGet auth JSON to file"
+      cat > "$(Build.SourcesDirectory)/_publish/Dockerfile.runtime" <<EOF
+      FROM mcr.microsoft.com/dotnet/aspnet:8.0
+      WORKDIR /app
+      COPY . .
+      ENTRYPOINT ["dotnet","${{ parameters.entryDll }}"]
+      EOF
+      echo "Created Dockerfile.runtime in _publish (ENTRYPOINT -> ${{ parameters.entryDll }})"
+    displayName: Create runtime Dockerfile
 
-
+  # Build & push the image from the *publish folder* as build context
   - task: Docker@2
-    displayName: Build & Push
-    env:
-     DOCKER_BUILDKIT: '1'
+    displayName: Build & Push runtime image
     inputs:
       command: buildAndPush
-      repository: ${{ parameters.repository }}
       containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
-      Dockerfile: ${{ parameters.dockerfilePath }}
-      buildContext: '$(Build.SourcesDirectory)'
-      arguments: >
-        --secret id=nuget_auth,src=$(Pipeline.Workspace)/nuget_auth.json
+      repository: ${{ parameters.repository }}
+      Dockerfile: '$(Build.SourcesDirectory)/_publish/Dockerfile.runtime'
+      buildContext: ${{ parameters.buildContext }}
       tags: ${{ parameters.tags }}
