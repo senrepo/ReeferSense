@@ -6,18 +6,15 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# receive the arg
-ARG NUGET_AUTH_B64
-
 COPY NuGet.config /src/NuGet.config
 COPY iot-data-processor/iot-data-processor.csproj iot-data-processor/
 
-# decode → export → restore in the SAME layer
-RUN set -e; \
-    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(printf %s "$NUGET_AUTH_B64" | base64 -d)"; \
-    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)"; \
-    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS; \
-    dotnet restore "iot-data-processor/iot-data-processor.csproj" --configfile /src/NuGet.config
+# Read the secret only during this step (not persisted in layers)
+RUN --mount=type=secret,id=nuget_auth \
+    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(cat /run/secrets/nuget_auth)" && \
+    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)" && \
+    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS && \
+    dotnet restore iot-data-processor/iot-data-processor.csproj --configfile /src/NuGet.config
 
 # Copy the rest and build
 COPY . .
