@@ -23,6 +23,8 @@ variables:
 
 - name: project
   value: sql-server-data-access/sql-server-data-access.csproj
+- name: package
+  value: sql-server-data-access
 - name: buildConfiguration
   value: Release
 - name: packageVersion
@@ -98,7 +100,7 @@ stages:
     - script: |
         echo "Feed URL: $(feedUrl)"
         echo "Pushing packages from: $(Pipeline.Workspace)/nuget"
-        dotnet nuget push "$(Pipeline.Workspace)/nuget/*.nupkg" \
+        dotnet nuget push "$(Pipeline.Workspace)/nuget/$(package)*.nupkg" \
           --source "$(feedUrl)" \
           --api-key AzureArtifacts \
           --skip-duplicate
