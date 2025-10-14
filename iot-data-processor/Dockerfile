@@ -1,32 +1,28 @@
-﻿# syntax=docker/dockerfile:1.4
+﻿# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
+USER app
 WORKDIR /app
 
+
+# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-COPY NuGet.config /src/NuGet.config
-COPY iot-data-processor/iot-data-processor.csproj iot-data-processor/
-
-# Read the secret only during this step (not persisted in layers)
-RUN --mount=type=secret,id=nuget_auth \
-    VSS_NUGET_EXTERNAL_FEED_ENDPOINTS="$(cat /run/secrets/nuget_auth)" && \
-    echo "Auth JSON length: $(printf %s "$VSS_NUGET_EXTERNAL_FEED_ENDPOINTS" | wc -c)" && \
-    export VSS_NUGET_EXTERNAL_FEED_ENDPOINTS && \
-    dotnet restore iot-data-processor/iot-data-processor.csproj --configfile /src/NuGet.config
-
-# Copy the rest and build
-COPY . .
-WORKDIR /src/iot-data-processor
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet build "iot-data-processor.csproj" -c "$BUILD_CONFIGURATION" -o /app/build --no-restore
+WORKDIR /src
+COPY ["iot-data-processor.csproj", "."]
+RUN dotnet restore "./iot-data-processor.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "./iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "iot-data-processor.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish --no-restore /p:UseAppHost=false
+RUN dotnet publish "./iot-data-processor.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet","iot-data-processor.dll"]
+ENTRYPOINT ["dotnet", "iot-data-processor.dll"]

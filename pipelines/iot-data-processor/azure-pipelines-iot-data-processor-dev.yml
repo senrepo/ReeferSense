@@ -30,8 +30,8 @@ variables:
 # Repo-specific values
 - name: project
   value: iot-data-processor/iot-data-processor.csproj
-- name: dockerfilePath
-  value: $(Build.SourcesDirectory)/iot-data-processor/Dockerfile
+- name: entryDll
+  value: iot-data-processor.dll
 - name: imageName
   value: iot-data-processor
 - name: buildConfiguration
@@ -58,9 +58,8 @@ stages:
     parameters:
       containerRegistryServiceConnection: $(acrServiceConnection)   # from env-dev var group
       repository: $(imageName)
-      dockerfilePath: $(dockerfilePath)
       projectPath: $(project)
-      entryDll: 'iot-data-processor.dll'
+      entryDll: $(entryDll)
       buildConfiguration: $(buildConfiguration)
 
   # 2) Create-if-missing OR update Container App (job template call)

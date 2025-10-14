@@ -94,6 +94,9 @@
     <Build Include="Stored Procedures\sp_cleanup_company_container_modem.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Seed Data\seed-data.sql" />
+    <None Include="Seed Data\seed-data.-cma.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Seed Data\seed-data-msc.sql" />
   </ItemGroup>
 </Project>

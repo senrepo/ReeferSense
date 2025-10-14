@@ -1,15 +1,13 @@
 # /pipelines/templates/docker-buildpush.yml
 parameters:
-  containerRegistryServiceConnection: ''                  # e.g., 'acr-dev'
-  repository: ''                                          # e.g., 'iot-gateway'
-  dockerfilePath: ''                                      # (unused in runtime-only flow; kept for compatibility)
-  buildContext: '$(Build.SourcesDirectory)/_publish'      # publish output folder
+  containerRegistryServiceConnection: ''                  
+  repository: ''               
+  projectPath: ''   
+  entryDll: ''    
+  buildConfiguration: 'Release'  
   tags: |
     $(Build.SourceBranchName)-$(Build.BuildId)
     $(Build.SourceBranchName)-latest
-  projectPath: 'iot-data-processor/iot-data-processor.csproj'   # <-- parameterized csproj
-  entryDll: 'iot-data-processor.dll'                             # <-- parameterized DLL name
-  buildConfiguration: 'Release'                                  # optional
 
 jobs:
 - job: docker_build_push
@@ -62,5 +60,5 @@ jobs:
       containerRegistry: ${{ parameters.containerRegistryServiceConnection }}
       repository: ${{ parameters.repository }}
       Dockerfile: '$(Build.SourcesDirectory)/_publish/Dockerfile.runtime'
-      buildContext: ${{ parameters.buildContext }}
+      buildContext: '$(Build.SourcesDirectory)/_publish'
       tags: ${{ parameters.tags }}

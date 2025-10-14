@@ -14,6 +14,6 @@
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="sql-server-data-access" Version="1.0.0-dev.298" />
+    <PackageReference Include="sql-server-data-access" Version="1.0.0-dev.395" />
   </ItemGroup>
 </Project>

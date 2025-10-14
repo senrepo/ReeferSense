@@ -153,7 +153,7 @@ BEGIN
     BEGIN
         INSERT INTO dbo.temperature_data_history(container_id,modem_imei,temperatureF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
         VALUES (@container_id,@modem_imei,  25,GETDATE(), 1, 100, Null, Null, 0,60, GETDATE());
-		        INSERT INTO dbo.temperature_data_history(container_id,vessel_id, temperaturF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
+		        INSERT INTO dbo.temperature_data_history(container_id,vessel_id, temperatureF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
         VALUES (@container_id, @vessel_id, 29,GETDATE()-1, 1, 100, Null, Null, 0,60, GETDATE());
 
         INSERT INTO dbo.temperature_data_history(container_id,modem_imei,temperatureF,logged_dt,power,battery_percent,co2_percent,o2_percent,deforsting,humidityPercent,received_dt) 
