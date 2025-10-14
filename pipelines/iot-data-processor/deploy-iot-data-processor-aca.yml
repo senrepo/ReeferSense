@@ -39,7 +39,6 @@ jobs:
           # CREATE: use --env-vars
           az containerapp create --name "${APP}" --resource-group "${RG}" --environment "${ENV_NAME}" \
             --image "${IMAGE}" --registry-server "${ACR_LOGIN}" --registry-username "${ACR_USER}" --registry-password "${ACR_PASS}" \
-            --ingress external --transport tcp --target-port 9000 --exposed-port 9000 \
             --env-vars DOTNET_ENVIRONMENT="${DOTNET_ENVIRONMENT}" AppSettings__ServiceBus__ConnectionString="${SB_CONNECTION_STRING}" AppSettings__ServiceBus__QueueName="${QUEUE_NAME}" AppSettings__SqlServer__ConnectionString="${SQL_CONNECTION_STRING}"
         else
           echo "Updating Container App ${APP}..."
