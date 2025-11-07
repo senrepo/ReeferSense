@@ -30,3 +30,23 @@ AZure SQL Server
 
 TEST TCP Connection
      Test-NetConnection iot-gateway-dev.wittywave-8117602b.centralus.azurecontainerapps.io -Port 9000
+
+
+Azure Data Explorer Kusto Emulator
+https://learn.microsoft.com/en-us/azure/data-explorer/kusto-emulator-overview
+
+Create cloud-native apps and services with .NET and ASP.NET Core
+https://learn.microsoft.com/en-us/training/paths/create-microservices-with-dotnet/
+
+EF Core
+https://learn.microsoft.com/en-us/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-8.0
+
+
+Code based Resiliency Approaches
+https://learn.microsoft.com/en-us/training/modules/microservices-resiliency-aspnet-core/
+    Retry strategy
+    Circuit Breaker strategy
+
+Observability with OpenTelemetry
+https://learn.microsoft.com/en-us/training/modules/implement-observability-cloud-native-app-with-opentelemetry/
+

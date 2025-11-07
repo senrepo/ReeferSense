@@ -161,51 +161,6 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-53" value="Storage Account&lt;div&gt;Push Data Config Tables&lt;/div&gt;" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts.svg;" vertex="1" parent="1">
-          <mxGeometry x="980" y="408" width="65" height="52" as="geometry" />
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-55" value="" style="endArrow=classic;html=1;rounded=0;exitX=1.09;exitY=0.438;exitDx=0;exitDy=0;exitPerimeter=0;entryX=-0.062;entryY=0.427;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="18" target="XRnKR8ARuL5o0D3u-q2F-53">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="820" y="440" as="sourcePoint" />
-            <mxPoint x="870" y="390" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-56" value="Azure Data Explorer&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Azure_Data_Explorer_Clusters.svg;" vertex="1" parent="1">
-          <mxGeometry x="1110" y="20" width="50" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-57" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="560" y="180" as="sourcePoint" />
-            <mxPoint x="1100" y="49" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-61" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="510" y="370" as="sourcePoint" />
-            <mxPoint x="560" y="320" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-62" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.948;exitY=0.493;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="e48FlYE4eot8dJqgmML9-66">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="810" y="650" as="sourcePoint" />
-            <mxPoint x="1147" y="100" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="1140" y="630" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-63" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="720" y="610" as="sourcePoint" />
-            <mxPoint x="970" y="460" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="XRnKR8ARuL5o0D3u-q2F-64" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="680" y="630" as="sourcePoint" />
-            <mxPoint x="530" y="630" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
