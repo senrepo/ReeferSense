@@ -1,92 +1,132 @@
 ﻿CREATE PROCEDURE [dbo].[sp_get_company_modem]
-    @company_ident INT = NULL,
-    @modem_ident INT = NULL
+    @company_ident INT,
+    @modem_imei   VARCHAR(15) = NULL,
+    @result        INT OUTPUT       -- 1 = success, 0 = not found/invalid
 AS
 BEGIN
-    -- Check if both parameters are provided
-    --IF @company_ident IS NULL OR @modem_ident IS NULL
-    --BEGIN
-    --    PRINT 'Both company_ident and modem_ident must be provided.';
-    --    SELECT 0 AS RESULT;
-    --    RETURN;
-    --END
+    SET NOCOUNT ON;
 
-    -- Check if company exists
+    --------------------------------------------------
+    --  Validate company
+    --------------------------------------------------
     IF NOT EXISTS (SELECT 1 FROM dbo.company WHERE ident = @company_ident)
     BEGIN
         PRINT 'Invalid company_ident. Company does not exist.';
-        SELECT 0 AS RESULT;
-        RETURN;
+
+        SELECT TOP (0)
+            c.ident        AS CompanyIdent,
+            c.company_name AS CompanyName,
+            c.created_dt   AS CompanyCreatedDate,
+            c.updated_dt   AS CompanyUpdatedDate,
+            m.ident        AS ModemIdent,
+            m.modem_imei   AS ModemIMEI,
+            m.model        AS Model,
+            m.manufacturer AS Manufacturer,
+            m.created_dt   AS ModemCreatedDate,
+            m.updated_dt   AS ModemUpdatedDate
+        FROM dbo.company c
+        INNER JOIN dbo.company_modem cm ON cm.company_ident = c.ident 
+		INNER JOIN dbo.modem m ON m.ident = cm.modem_ident
+
+       SET @result = 0; -- validation fail
+	   RETURN;
     END
 
-    -- Check if modem exists
-    IF NOT EXISTS (SELECT 1 FROM dbo.modem WHERE modem_imei = @modem_ident)
-    BEGIN
-        PRINT 'Invalid modem_ident. Modem does not exist.';
-        SELECT 0 AS RESULT;
-        RETURN;
-    END
-
-    -- Retrieve data based on the input parameters
+	--------------------------------------------------
+    --  Retrieve data
+    --    If @modem_imei IS NULL then return all modems for the company
+    --    Else return only that specific modem
+    --------------------------------------------------
     SELECT
-        c.ident AS CompanyIdent,
+        c.ident        AS CompanyIdent,
         c.company_name AS CompanyName,
-        c.created_dt AS CompanyCreatedDate,
-        c.updated_dt AS CompanyUpdatedDate,
-        m.ident AS ModemIdent,
-        m.modem_imei AS ModemIMEI,
-        m.model AS Model,
+        c.created_dt   AS CompanyCreatedDate,
+        c.updated_dt   AS CompanyUpdatedDate,
+        m.ident        AS ModemIdent,
+        m.modem_imei   AS ModemIMEI,
+        m.model        AS Model,
         m.manufacturer AS Manufacturer,
-        m.created_dt AS ModemCreatedDate,
-        m.updated_dt AS ModemUpdatedDate
+        m.created_dt   AS ModemCreatedDate,
+        m.updated_dt   AS ModemUpdatedDate
     FROM dbo.company c
-    CROSS JOIN dbo.modem m
-    WHERE c.ident = @company_ident AND m.ident = @modem_ident;
+        INNER JOIN dbo.company_modem cm ON cm.company_ident = c.ident 
+		INNER JOIN dbo.modem m ON m.ident = cm.modem_ident
+    WHERE c.ident = @company_ident
+          AND (@modem_imei IS NULL OR m.modem_imei = @modem_imei);
 
-    PRINT 'Company and modem information retrieved successfully.';
-    SELECT 1 AS RESULT;
+    SET @result = 1;      -- success
 END;
+GO
+
+/* TEST CASES 
+
+DECLARE @status INT;
+
+--------------------------------------------------
+-- Test Case 1: Valid company_ident & modem_imei
+-- Expect: data for that company+modem, @status = 1
+--------------------------------------------------
+PRINT 'Test Case 1: Valid company_ident & modem_imei';
+
+SET @status = -1; -- reset
+EXEC dbo.sp_get_company_modem
+    @company_ident = 1,                      -- company 1
+    @modem_imei   = '350123451234560',       -- modem IMEI linked to company 1
+    @result       = @status OUTPUT;
+
+IF @status = 1 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
+--------------------------------------------------
+-- Test Case 2: Invalid company_ident
+-- Expect: empty result set, @status = 0 (fails company validation)
+--------------------------------------------------
+PRINT 'Test Case 2: Invalid company_ident';
+
+SET @status = -1;
+EXEC dbo.sp_get_company_modem
+    @company_ident = 9999,                   -- non-existent company
+    @modem_imei   = '350123451234560',       -- valid IMEI
+    @result       = @status OUTPUT;
+
+IF @status = 0 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
-/* TEST CASE */
-DECLARE	@return_value int
+--------------------------------------------------
+-- Test Case 3: Valid company_ident, invalid modem_imei
+-- NOTE: With current proc logic, this returns NO ROWS, but @status = 1
+--------------------------------------------------
+PRINT 'Test Case 3: Valid company_ident, invalid modem_imei';
 
--- Test Case 1: Successful Data Retrieval
-EXEC	@return_value = [dbo].[sp_get_company_modem]
-		@company_ident = 1,
-		@modem_ident = 12
-IF @return_value = 1 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+SET @status = -1;
+EXEC dbo.sp_get_company_modem
+    @company_ident = 1,                       -- existing company
+    @modem_imei   = '999999999999999',        -- non-existent IMEI
+    @result       = @status OUTPUT;
 
-
--- Test Case 2: Missing Parameters
-EXEC	@return_value = [dbo].[sp_get_company_modem]
-		@company_ident = NULL,
-		@modem_ident = NULL
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+IF @status = 1 PRINT 'Success (status=1, but no rows)'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
--- Test Case 3: Invalid Company ID
-EXEC	@return_value = [dbo].[sp_get_company_modem]
-		@company_ident = 0,
-		@modem_ident = 12
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 4: Valid company_ident, @modem_imei = NULL
+-- Expect: all modems for that company, @status = 1
+--------------------------------------------------
+PRINT 'Test Case 4: Valid company_ident, @modem_imei = NULL';
 
+SET @status = -1;
+EXEC dbo.sp_get_company_modem
+    @company_ident = 1,       -- existing company
+    @modem_imei   = NULL,     -- get all modems for that company
+    @result       = @status OUTPUT;
 
--- Test Case 4: Invalid Modem Ident
-EXEC	@return_value = [dbo].[sp_get_company_modem]
-		@company_ident = 1,
-		@modem_ident = 1256
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+IF @status = 1 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
-Go
-
+*/

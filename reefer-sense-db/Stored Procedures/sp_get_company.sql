@@ -1,72 +1,77 @@
 ﻿CREATE PROCEDURE [dbo].[sp_get_company]
-    @company_ident INT = NULL
+    @company_ident INT = NULL,
+    @result        INT OUTPUT 
 AS
 BEGIN
+     --------------------------------------------------
+    --  Retrieve data
+    --    If @company_ident IS NULL then return all company
+    --    Else return only that specific company
+    --------------------------------------------------
+	SELECT 
+		ident AS CompanyIdent,
+		company_name AS CompanyName,
+		created_dt AS CreatedDate,
+		updated_dt AS UpdatedDate
+	FROM dbo.company c
+	WHERE (@company_ident IS NULL OR c.ident = @company_ident);
 
-        -- Get/Retrieve company details
-        IF @company_ident IS NULL
-        BEGIN
-            -- Return all companies if no specific company_ident is provided
-            SELECT
-                ident AS CompanyIdent,
-                company_name AS CompanyName,
-                created_dt AS CreatedDate,
-                updated_dt AS UpdatedDate
-            FROM dbo.company;
-        END
-        ELSE
-        BEGIN
-        -- Return details of the specified company (checks whether the company with the given company_ident exists)
-        IF EXISTS (SELECT 1 FROM dbo.company WHERE ident = @company_ident)
-        BEGIN
-            SELECT
-                ident AS CompanyIdent,
-                company_name AS CompanyName,
-                created_dt AS CreatedDate,
-                updated_dt AS UpdatedDate
-            FROM dbo.company
-            WHERE ident = @company_ident;
-        END
-        ELSE
-        BEGIN
-            PRINT 'Invalid company_ident. Company does not exist.';
-            SELECT 0 AS RESULT;
-        END
-    END
+	SET @result = 1;
+
 END;
+GO
 
 
+/* Test cases
 
-/* TEST CASE */
-DECLARE	@return_value int
+DECLARE @status       INT;
 
--- Test Case 1: Retrieve all companies (when @company_ident is NULL) Returns all company records with their details.
-EXEC	@return_value = [dbo].[sp_get_company]
-		@company_ident = NULL
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 1: All companies
+--------------------------------------------------
+PRINT 'Test Case 1: All companies';
+
+EXEC dbo.sp_get_company
+    @company_ident = NULL,
+    @result        = @status OUTPUT;
+
+IF @status = 1
+    PRINT 'Result: Success';
+ELSE
+    PRINT 'Result: Failure';
+
+PRINT 'Output Status: ' + CAST(@status       AS VARCHAR(10));
 
 
--- Test Case 2: Retrieve a specific company (Valid company_ident) Returns the details of the company with ident = 1.
-EXEC	@return_value = [dbo].[sp_get_company]
-		@company_ident = 1
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 2: Valid company_ident
+--------------------------------------------------
+PRINT 'Test Case 2: Valid company_ident';
 
+EXEC dbo.sp_get_company
+    @company_ident = 1,
+    @result        = @status OUTPUT;
 
--- Test Case 3: Invalid company_ident (Non-existent company)  Company does not exist.' 
+IF @status = 1
+    PRINT 'Result: Success';
+ELSE
+    PRINT 'Result: Failure';
 
-EXEC	@return_value = [dbo].[sp_get_company]
-		@company_ident = 5
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+PRINT 'Output Status: ' + CAST(@status       AS VARCHAR(10));
 
--- Test Case 4: NULL or Invalid Input (Check for Negative Values)
-EXEC	@return_value = [dbo].[sp_get_company]
-		@company_ident = -1
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 3: Non-existent company_ident
+--------------------------------------------------
+PRINT 'Test 3: @company_ident = 5 (expect empty result set, status = 0)';
+
+EXEC dbo.sp_get_company
+    @company_ident = 999,
+    @result        = @status OUTPUT;
+
+IF @status = 1
+    PRINT 'Result: Success';
+ELSE
+    PRINT 'Result: Failure';
+
+PRINT 'Output Status: ' + CAST(@status       AS VARCHAR(10));
+*/

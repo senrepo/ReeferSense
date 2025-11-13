@@ -41,6 +41,10 @@ https://learn.microsoft.com/en-us/training/paths/create-microservices-with-dotne
 EF Core
 https://learn.microsoft.com/en-us/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-8.0
 
+Commands
+    dotnet tool install --global dotnet-ef 
+    dotnet ef dbcontext scaffold "Server=127.0.0.1,1450;Database=ReeferSense;User Id=sa;Password=ReeferSense@2025;Encrypt=True;TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer --output-dir Models --context-dir Context --context ReeferSenseDbContext --use-database-names --force  --no-build
+
 
 Code based Resiliency Approaches
 https://learn.microsoft.com/en-us/training/modules/microservices-resiliency-aspnet-core/

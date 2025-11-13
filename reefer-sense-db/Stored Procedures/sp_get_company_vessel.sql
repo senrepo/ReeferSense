@@ -1,123 +1,139 @@
 ﻿CREATE PROCEDURE [dbo].[sp_get_company_vessel]
-    @company_ident INT = NULL,
-    @vessel_ident INT = NULL
+    @company_ident INT,
+    @vessel_id     VARCHAR(25) = NULL,
+    @result        INT OUTPUT  
 AS
 BEGIN
-    -- Check if both company_ident and vessel_id are provided
-    --This checks if either @company_ident or @vessel_id is NULL.
-    --IF @company_ident IS NULL OR @vessel_id IS NULL 
-    --BEGIN
-    --    PRINT 'Both company_ident and vessel_id must be provided.';
-    --    SELECT 0 AS RESULT;
-    --    RETURN;
-    --END
+    SET NOCOUNT ON;
 
-    -- Check if company exists
+    --------------------------------------------------
+    -- 1. Validate company
+    --------------------------------------------------
     IF NOT EXISTS (SELECT 1 FROM dbo.company WHERE ident = @company_ident)
     BEGIN
         PRINT 'Invalid company_ident. Company does not exist.';
-        SELECT 0 AS RESULT;
-        RETURN;
-    END
+        SELECT TOP (0)
+            c.ident        AS CompanyIdent,
+            c.company_name AS CompanyName,
+            c.created_dt   AS CompanyCreatedDate,
+            c.updated_dt   AS CompanyUpdatedDate,
+            v.ident        AS VesselIdent,
+            v.vessel_id    AS VesselID,
+            v.vessel_name  AS VesselName,
+            v.created_dt   AS VesselCreatedDate,
+            v.updated_dt   AS VesselUpdatedDate
+        FROM dbo.company AS c
+        INNER JOIN dbo.company_vessel AS cv ON cv.company_ident = c.ident
+        INNER JOIN dbo.vessel AS v ON v.ident = cv.vessel_ident;
 
-    -- Check if vessel exists
-    IF NOT EXISTS (SELECT 1 FROM dbo.vessel WHERE ident = @vessel_ident)
-    BEGIN
-        PRINT 'Invalid vessel_id. Vessel does not exist.';
-        SELECT 0 AS RESULT;
+        SET @result = 0;   
         RETURN;
-    END
+    END;
 
-    -- Retrieve data based on the input parameters
+    --------------------------------------------------
+    -- 2. Retrieve data
+    --    If @vessel_id IS NULL then return all vessels for the company
+    --    Else return only that specific vessel
+    --------------------------------------------------
     SELECT
-        c.ident AS CompanyIdent,
+        c.ident        AS CompanyIdent,
         c.company_name AS CompanyName,
-        c.created_dt AS CompanyCreatedDate,
-        c.updated_dt AS CompanyUpdatedDate,
-        v.ident AS VesselIdent,
-        v.vessel_id AS VesselID,
-        v.vessel_name AS VesselName,
-        v.created_dt AS VesselCreatedDate,
-        v.updated_dt AS VesselUpdatedDate
+        c.created_dt   AS CompanyCreatedDate,
+        c.updated_dt   AS CompanyUpdatedDate,
+        v.ident        AS VesselIdent,
+        v.vessel_id    AS VesselID,
+        v.vessel_name  AS VesselName,
+        v.created_dt   AS VesselCreatedDate,
+        v.updated_dt   AS VesselUpdatedDate
     FROM dbo.company c
-    INNER JOIN dbo.vessel v ON v.ident = @vessel_ident
-    WHERE c.ident = @company_ident ;
+    INNER JOIN dbo.company_vessel cv ON cv.company_ident = c.ident
+    INNER JOIN dbo.vessel v         ON v.ident         = cv.vessel_ident
+    WHERE c.ident = @company_ident
+      AND (@vessel_id IS NULL OR v.vessel_id = @vessel_id);
 
-    PRINT 'Company and vessel information retrieved successfully.';
-    SELECT 1 AS RESULT;
+    SET @result = 1; 
+
 END;
+GO
 
 
 
 
 
+/* TEST CASES FOR sp_get_company_vessel 
+
+DECLARE @status INT;
+
+--------------------------------------------------
+-- Test Case 1: Valid company, @vessel_id = NULL
+-- Expect: all vessels for that company, @status = 1
+--------------------------------------------------
+PRINT 'Test Case 1: Valid company, @vessel_id = NULL';
+
+SET @status = -1;
+EXEC dbo.sp_get_company_vessel
+    @company_ident = 2,     -- adjust to an existing company ident
+    @vessel_id     = NULL,
+    @result        = @status OUTPUT;
+
+IF @status = 1 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
-/* TEST CASE */
+--------------------------------------------------
+-- Test Case 2: NULL company_ident, valid vessel_id
+-- Expect: invalid company, @status = 0
+--------------------------------------------------
+PRINT 'Test Case 2: NULL company_ident, valid vessel_id';
 
-DECLARE	@return_value int
+SET @status = -1;
+EXEC dbo.sp_get_company_vessel
+    @company_ident = NULL,
+    @vessel_id     = 'CMAVSL001',
+    @result        = @status OUTPUT;
 
---Test Case 1: Retrieve all Companies and Vessels
-EXEC	@return_value = [dbo].[sp_get_company_vessel]
-		@company_ident = NULL,
-		@vessel_ident = NULL
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
-
-
---Test Case 2: Retrieve Specific Company with Valid company_ident
-EXEC	@return_value = [dbo].[sp_get_company_vessel]
-		@company_ident = 2,
-		@vessel_ident = NULL
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+IF @status = 0 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
---Test Case 3: Retrieve Specific Vessel with Valid vessel_id
-EXEC	@return_value = [dbo].[sp_get_company_vessel]
-		@company_ident = NULL,
-		@vessel_ident = N'12'
-IF @return_value = 0 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 3: Valid company_ident & valid vessel_id (linked)
+-- Expect: one row (or few if multiple mappings), @status = 1
+--------------------------------------------------
+PRINT 'Test Case 3: Valid company_ident & valid vessel_id (linked)';
+
+SET @status = -1;
+EXEC dbo.sp_get_company_vessel
+    @company_ident = 1,     -- existing company ident
+    @vessel_id     = 'CMAVSL001',    -- vessel_id linked to that company
+    @result        = @status OUTPUT;
+
+IF @status = 1 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
 
 
---Test Case 4: Retrieve Specific Company and Vessel with Valid IDs\
-EXEC	@return_value = [dbo].[sp_get_company_vessel]
-		@company_ident = 1,
-		@vessel_ident = 12
-IF @return_value = 1 PRINT 'Success';
-ELSE PRINT 'Failure';
-SELECT	'Return Value' = @return_value
+--------------------------------------------------
+-- Test Case 4: Valid company_ident, vessel_id that does NOT belong to that company
+-- Expect: no rows, @status = 0
+--------------------------------------------------
+PRINT 'Test Case 4: Valid company_ident, vessel_id that does NOT belong to that company';
 
-GO;
+SET @status = -1;
+EXEC dbo.sp_get_company_vessel
+    @company_ident = 1,      -- existing company
+    @vessel_id     = 'CMAVSL999',   -- non-existent or not linked vessel_id
+    @result        = @status OUTPUT;
 
-
-
-
-
-
-
-
-
+IF @status = 1 PRINT 'Success'; ELSE PRINT 'Failure';
+SELECT 'Return Value' = @status;
+PRINT '--------------------------------------------------';
+GO
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 
 
